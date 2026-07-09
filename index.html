@@ -1,1 +1,237 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zebra Label Print</title>
+    
+    <!-- Flatpickr ბიბლიოთეკის ჩართვა (კალენდრის და დროის 24-სთ ფორმატისთვის) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <style>
+        /* =========================================
+           1. ეკრანის (UI) დიზაინი
+           ========================================= */
+        :root {
+            --bg-body: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --btn-bg: #0f172a;
+            --btn-hover: #334155;
+            --focus-ring: #3b82f6;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 28px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 24px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: var(--focus-ring);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s ease, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.2;
+        }
+
+        /* =========================================
+           2. ბეჭდვის კონფიგურაცია (Zebra)
+           ========================================= */
+        #print-wrapper { display: none; }
+
+        @media print {
+            .app-container { display: none !important; }
+
+            /* ბრაუზერის კიდეების გაუქმება */
+            @page { margin: 0; }
+
+            /* ტექსტი მკაცრად ზედა ცენტრში */
+            body, html {
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+                
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important; /* მაგრდება ზედა კიდეზე */
+                align-items: center !important;         /* სწორდება შუაგულში (ცენტრში) */
+                height: 100vh !important;
+                width: 100vw !important;
+            }
+
+            #print-wrapper {
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+                padding-top: 1mm !important; /* უმცირესი დაშორება ზემოდან */
+                margin: 0 !important;
+            }
+
+            #print-name {
+                font-size: 10pt !important; 
+                font-weight: bold;
+                line-height: 1.1;
+                margin: 0 0 2px 0 !important;
+                color: black !important;
+                word-wrap: break-word;
+            }
+
+            #print-time {
+                font-size: 8pt !important; 
+                margin: 0 !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2 class="header-title">ლეიბლის ბეჭდვა</h2>
+    
+    <div class="input-wrapper">
+        <label>მედიკამენტი</label>
+        <textarea id="med-name" placeholder="ჩაწერეთ დასახელება..." oninput="updatePreview()"></textarea>
+    </div>
+    
+    <div class="input-wrapper">
+        <label>თარიღი და დრო</label>
+        <!-- აქ აღარ არის datetime-local, იყენებს სპეციალურ 24სთ-იან კალენდარს -->
+        <input type="text" id="med-time" placeholder="აირჩიეთ დრო">
+    </div>
+    
+    <button onclick="window.print()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        ბეჭდვა
+    </button>
+</div>
+
+<!-- ბლოკი რომელიც დაიბეჭდება -->
+<div id="print-wrapper">
+    <div id="print-name">მედიკამენტი</div>
+    <div id="print-time"></div>
+</div>
+
+<script>
+    // Flatpickr-ის ინიციალიზაცია 24-საათიანი ფორმატით
+    flatpickr("#med-time", {
+        enableTime: true,
+        time_24hr: true, // მკაცრად 24-საათიანი რეჟიმი (23:00 და არა 11:00 PM)
+        dateFormat: "d.m.Y | H:i", // ზუსტად ის ფორმატი, რაც უნდა დაიბეჭდოს
+        defaultDate: new Date(), // ნაგულისხმევად მიმდინარე დრო
+        onChange: function(selectedDates, dateStr, instance) {
+            updatePreview(); // დროის შეცვლისას ახლდება დასაბეჭდი ბლოკი
+        }
+    });
+
+    function updatePreview() {
+        const name = document.getElementById('med-name').value.trim() || 'მედიკამენტი';
+        // Flatpickr ავტომატურად გვაძლევს მზა ტექსტს (მაგ: 15.05.2024 | 23:20)
+        const dateStr = document.getElementById('med-time').value;
+        
+        document.getElementById('print-name').innerText = name;
+        document.getElementById('print-time').innerText = dateStr;
+    }
+
+    // საწყისი განახლება
+    updatePreview();
+</script>
+
+</body>
+</html>
