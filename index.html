@@ -87,13 +87,13 @@
                 <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Benutzername</label>
-                        <input type="text" id="username-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="alex">
+                        <input type="text" id="username-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
                         <span id="username-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Passwort</label>
-                        <input type="password" id="password-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="2911">
+                        <input type="password" id="password-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
                         <span id="password-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
                     </div>
 
@@ -166,7 +166,7 @@
             <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
             <div class="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
         </div>
-        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">Wird geladen...</span>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse"></span>
     </div>
 
     <!-- Modals (Shift Detail) -->
@@ -201,7 +201,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Einstellungen</h3>
                         <!-- Text entfernt -->
                     </div>
                 </div>
@@ -241,14 +241,14 @@
     <div id="delete-confirm-modal" class="fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h4 class="font-bold text-slate-900">Schicht löschen bestätigen</h4>
+                <h4 class="font-bold text-slate-900">bestätigen</h4>
             </div>
             <div id="delete-confirm-content" class="p-6 space-y-3">
                 <!-- Populated dynamically -->
             </div>
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
                 <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Ja, löschen</button>
+                <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">löschen</button>
             </div>
         </div>
     </div>
@@ -437,7 +437,6 @@
                 appState.isLoggedIn = true;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-app-view').classList.remove('hidden');
-                showToast('Erfolgreich angemeldet.', 'info');
                 renderCalendar();
             }, 800);
         }
@@ -700,7 +699,7 @@
             const content = document.getElementById('shift-detail-content');
             content.innerHTML = `
                 <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tag & Datum</span>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Datum</span>
                     <span class="text-lg font-bold text-slate-900 mt-1">${formattedDetail}</span>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
@@ -781,15 +780,15 @@
 
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von Datum</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von</label>
                             <input type="date" id="add-start-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeStart}">
                         </div>
                         <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis Datum</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis</label>
                             <input type="date" id="add-end-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeEnd}">
                         </div>
                         <div class="pt-5">
-                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Bereich markieren</button>
+                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">markieren</button>
                         </div>
                     </div>
 
@@ -907,7 +906,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
 
             html += `</div>
                 <div class="flex justify-end pt-4 border-t border-slate-200">
-                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Alle Schichten speichern</button>
+                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">speichern</button>
                 </div>
             </div>`;
             container.innerHTML = html;
@@ -974,7 +973,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
         function removeAddedDateIfNoTime(dateStr) {
             const data = appState.addedShiftTimesData[dateStr];
             if (data && (data.start || data.end)) {
-                showToast('Kann nicht entfernt werden, da Arbeitszeiten zugewiesen sind.', 'error');
+                showToast('Kann nicht entfernt werden.', 'error');
                 return;
             }
             appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
@@ -1011,7 +1010,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
             appState.selectedAddDates = [];
             appState.addedShiftTimesData = {};
             appState.addShiftStep = 'dates';
-            showToast('Schichten erfolgreich hinzugefügt.', 'info');
+            showToast('Schichten hinzugefügt.', 'info');
             saveToFirebase(); // Firebase Sync
             switchSettingsTab('add');
         }
@@ -1026,10 +1025,10 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                     <div class="flex items-center justify-between">
                         <div>
                             <h4 class="text-lg font-bold text-slate-900">Schichten löschen</h4>
-                            <p class="text-xs text-slate-500 mt-0.5">Aktueller Monat: ${monthNames[month]} ${year}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Monat: ${monthNames[month]} ${year}</p>
                         </div>
                         <button onclick="toggleDeleteMode()" class="px-5 py-2.5 ${appState.deleteModeActive ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} rounded-xl text-sm font-semibold transition-all shadow-sm">
-                            ${appState.deleteModeActive ? 'Auswahl beenden' : 'Schicht löschen aktivieren'}
+                            ${appState.deleteModeActive ? 'beenden' : 'aktivieren'}
                         </button>
                     </div>
 
@@ -1100,7 +1099,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
             if (shift) {
                 shift.deleted = true;
                 appState.deletedShifts.push(shift);
-                showToast('Schicht erfolgreich gelöscht.', 'info');
+                showToast('Schicht gelöscht.', 'info');
                 saveToFirebase(); // Firebase Sync
             }
             closeDeleteConfirmModal();
@@ -1213,7 +1212,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
             shift.department = document.getElementById('edit-dept').value;
 
             closeEditShiftModal();
-            showToast('Schicht erfolgreich aktualisiert.', 'info');
+            showToast('Schicht aktualisiert.', 'info');
             saveToFirebase(); // Firebase Sync
             switchSettingsTab('edit');
         }
@@ -1236,7 +1235,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
             if (shift) {
                 shift.date = targetDate;
                 shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
-                showToast(`Schicht erfolgreich auf ${formatDate(targetDate)} verschoben.`, 'info');
+                showToast(`Schicht auf ${formatDate(targetDate)} verschoben.`, 'info');
                 saveToFirebase(); // Firebase Sync
             }
             closeMoveDateModal();
@@ -1449,7 +1448,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                 const shift = appState.deletedShifts.splice(appState.pendingRestoreIndex, 1)[0];
                 shift.deleted = false;
                 appState.shifts.push(shift);
-                showToast('Schicht erfolgreich wiederhergestellt.', 'info');
+                showToast('Schicht wiederhergestellt.', 'info');
                 saveToFirebase(); // Firebase Sync
             }
             closeRestoreConfirmModal();
@@ -1457,7 +1456,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
         }
 
         async function downloadPDFReport() {
-            showToast('PDF wird generiert, bitte warten...', 'info');
+            showToast('PDF wird generiert...', 'info');
             const element = document.getElementById('pdf-report-area');
             
             const pdfHeader = element.querySelector('.pdf-only-header');
@@ -1486,7 +1485,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                 pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
                 pdf.save(`ShogiDienste_Report_${formatDate(new Date())}.pdf`);
                 
-                showToast('PDF erfolgreich exportiert!', 'info');
+                showToast('PDF exportiert!', 'info');
             } catch(e) {
                 console.error(e);
                 showToast('Fehler bei der PDF Generierung', 'error');
