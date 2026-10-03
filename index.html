@@ -58,6 +58,34 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* ციმციმის ანიმაცია სტაფილოსფერი (Orange) აქცენტით */
+        @keyframes pulse-today-border {
+            0%, 100% { 
+                border-color: rgba(249, 115, 22, 0.4); 
+                background-color: rgba(249, 115, 22, 0.05); 
+                box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); 
+            }
+            50% { 
+                border-color: rgba(249, 115, 22, 1); 
+                background-color: rgba(249, 115, 22, 0.2); 
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); 
+            }
+        }
+        .today-highlight {
+            position: relative;
+        }
+        .today-highlight::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 2px solid transparent;
+            animation: pulse-today-border 2s ease-in-out infinite;
+            z-index: 40;
+            border-radius: inherit;
+        }
+
     </style>
 </head>
 <body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden flex flex-col">
@@ -72,7 +100,6 @@
 
             <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
                 <div class="flex items-center space-x-3 mb-8">
-                    <!-- SVG ohne blauen Hintergrund -->
                     <div class="w-12 h-12 flex items-center justify-center text-indigo-600">
                         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -80,7 +107,6 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
-                        <!-- Untertext entfernt -->
                     </div>
                 </div>
 
@@ -110,7 +136,6 @@
         <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
             <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
                 <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
-                    <!-- SVG ohne blauen Hintergrund, exakt wie auf der Login-Seite -->
                     <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-800 transition-colors">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -139,7 +164,6 @@
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
-                        <!-- Text entfernt -->
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
@@ -160,7 +184,7 @@
 
     </div>
 
-    <!-- Neuer Spinner -->
+    <!-- Spinner -->
     <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-50/80 backdrop-blur-xl hidden flex-col items-center justify-center">
         <div class="relative w-16 h-16 mb-4">
             <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
@@ -179,7 +203,6 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
-                        <!-- Text entfernt -->
                     </div>
                 </div>
                 <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
@@ -202,7 +225,6 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900">Einstellungen</h3>
-                        <!-- Text entfernt -->
                     </div>
                 </div>
                 <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
@@ -380,6 +402,15 @@
             });
         });
 
+        // ლოკალური დროით თარიღის სტრინგის გენერირების ფუნქცია (თავიდან ირიდებს Timezone შეცდომებს)
+        function toLocalISODate(dateObj) {
+            const d = new Date(dateObj);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function formatDate(dateObj) {
             const d = new Date(dateObj);
             const day = String(d.getDate()).padStart(2, '0');
@@ -437,6 +468,7 @@
                 appState.isLoggedIn = true;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-app-view').classList.remove('hidden');
+                showToast('Erfolgreich angemeldet.', 'info');
                 renderCalendar();
             }, 800);
         }
@@ -543,10 +575,9 @@
 
             const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
             
-            // Layout mit exakt 1 Zelle = 1 Stunde (24 Spalten) und absoluter Positionierung für feine Zeiten
             let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col h-full">`;
             html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-10" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
-            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center"></div>`;
+            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center">Wochentag</div>`;
             for (let h = 0; h < 24; h++) {
                 const timeStr = String(h).padStart(2, '0') + ':00';
                 html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500">${timeStr}</div>`;
@@ -554,11 +585,15 @@
             html += `</div>`;
 
             days.forEach((d, idx) => {
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = toLocalISODate(d);
                 const formattedDate = formatDate(d);
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
 
-                html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
+                // Check today using local time logic
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative ${isToday ? 'today-highlight bg-emerald-50/30' : ''}" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
                 
                 // Day Label
                 html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center h-full z-10" style="grid-row: 1; grid-column: 1;">
@@ -630,10 +665,13 @@
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
                 const hasShift = dayShifts.length > 0;
 
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
                 if (hasShift) {
-                    html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer" onclick="openShiftDetail('${dayShifts[0].id}')">
-                        <div class="text-xs font-bold text-white mb-2">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
-                        <div class="space-y-2 overflow-y-auto max-h-[90px]">`;
+                    html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer relative ${isToday ? 'today-highlight' : ''}" onclick="openShiftDetail('${dayShifts[0].id}')">
+                        <div class="text-xs font-bold text-white mb-2 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="space-y-2 overflow-y-auto max-h-[90px] relative z-20">`;
                     dayShifts.forEach(shift => {
                         html += `<div class="text-[11px] text-white flex flex-col leading-tight border-t border-emerald-400/50 pt-1 first:border-0 first:pt-0">
                             <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
@@ -642,9 +680,9 @@
                     });
                     html += `</div></div>`;
                 } else {
-                    html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col">
-                        <div class="text-xs font-bold text-slate-700">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
-                        <div class="text-[10px] text-slate-300 italic pt-2">Keine Schicht</div>
+                    html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col relative ${isToday ? 'today-highlight' : ''}">
+                        <div class="text-xs font-bold text-slate-700 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="text-[10px] text-slate-300 italic pt-2 relative z-20">Keine Schicht</div>
                     </div>`;
                 }
             }
@@ -679,10 +717,13 @@
                     const dStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                     const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
                     
+                    const todayStr = toLocalISODate(new Date());
+                    const isToday = dStr === todayStr;
+
                     if (shift) {
-                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs" title="${shift.type} (${shift.startTime}-${shift.endTime})">${d}</div>`;
+                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs relative ${isToday ? 'today-highlight' : ''}" title="${shift.type} (${shift.startTime}-${shift.endTime})"><span class="relative z-20">${d}</span></div>`;
                     } else {
-                        html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100">${d}</div>`;
+                        html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100 relative ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${d}</span></div>`;
                     }
                 }
                 html += `</div></div>`;
@@ -780,15 +821,15 @@
 
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von Datum</label>
                             <input type="date" id="add-start-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeStart}">
                         </div>
                         <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis Datum</label>
                             <input type="date" id="add-end-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeEnd}">
                         </div>
                         <div class="pt-5">
-                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">markieren</button>
+                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Bereich markieren</button>
                         </div>
                     </div>
 
@@ -807,20 +848,23 @@
                 html += `<div></div>`;
             }
 
-for (let day = 1; day <= lastDay.getDate(); day++) {
-    const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const isSelected = appState.selectedAddDates.includes(dStr);
-    const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
-    
-    let bgClass = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
-    if (isSelected) {
-        bgClass = 'bg-emerald-700 text-white border-emerald-800 shadow-md';
-    } else if (hasShift) {
-        bgClass = 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
-    }
-    
-    html += `<div onclick="toggleDateSelection('${dStr}')" class="p-3 rounded-xl border text-center text-xs font-bold cursor-pointer transition-all ${bgClass}">${day}</div>`;
-}
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isSelected = appState.selectedAddDates.includes(dStr);
+                const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
+                
+                let bgClass = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
+                if (isSelected) {
+                    bgClass = 'bg-emerald-700 text-white border-emerald-800 shadow-md';
+                } else if (hasShift) {
+                    bgClass = 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
+                }
+                
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dStr === todayStr;
+
+                html += `<div onclick="toggleDateSelection('${dStr}')" class="p-3 rounded-xl border text-center text-xs font-bold cursor-pointer transition-all relative ${bgClass} ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${day}</span></div>`;
+            }
 
             html += `</div></div></div>`;
             container.innerHTML = html;
@@ -855,7 +899,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
             let dates = [];
             let curr = new Date(startDate);
             while (curr <= endDate) {
-                dates.push(curr.toISOString().split('T')[0]);
+                dates.push(toLocalISODate(curr));
                 curr.setDate(curr.getDate() + 1);
             }
             appState.selectedAddDates = dates;
@@ -906,7 +950,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
 
             html += `</div>
                 <div class="flex justify-end pt-4 border-t border-slate-200">
-                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">speichern</button>
+                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Alle Schichten speichern</button>
                 </div>
             </div>`;
             container.innerHTML = html;
@@ -1001,8 +1045,8 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                         startTime: data.start,
                         endTime: data.end,
                         duration: durationStr,
-                        department: data.dept || '',
-                        location: data.loc || '',
+                        department: data.dept || 'Intensivmedizin',
+                        location: data.loc || 'Station A',
                         deleted: false
                     });
                 }
@@ -1046,20 +1090,23 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                 html += `<div class="p-4 min-h-[100px] border-b border-r border-slate-200/50"></div>`;
             }
 
-for (let day = 1; day <= lastDay.getDate(); day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
 
-    html += `<div class="p-3 min-h-[100px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500' : 'bg-white'} flex flex-col justify-between relative transition-colors">
-        <div class="flex justify-between items-center">
-            <span class="text-xs font-bold ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(`${year}-${month+1}-${day}`)}</span>
-            ${appState.deleteModeActive && shift ? `<button onclick="promptDeleteShift('${shift.id}')" class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-700 text-white flex items-center justify-center transition-all shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </button>` : ''}
-        </div>
-        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1"><span class="font-bold text-white">${shift.type}</span>${shift.startTime}-${shift.endTime}</div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
-    </div>`;
-}
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div class="p-3 min-h-[100px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500' : 'bg-white'} ${isToday ? 'today-highlight' : ''} flex flex-col justify-between relative transition-colors">
+                        <div class="flex justify-between items-center relative z-20">
+                            <span class="text-xs font-bold ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(`${year}-${month+1}-${day}`)}</span>
+                            ${appState.deleteModeActive && shift ? `<button onclick="promptDeleteShift('${shift.id}')" class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-700 text-white flex items-center justify-center transition-all shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </button>` : ''}
+                        </div>
+                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span>${shift.startTime}-${shift.endTime}</div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
+                </div>`;
+            }
 
             html += `</div></div>`;
             container.innerHTML = html;
@@ -1134,15 +1181,18 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                 html += `<div class="p-4 min-h-[90px] border-b border-r border-slate-200/50"></div>`;
             }
 
-for (let day = 1; day <= lastDay.getDate(); day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
 
-    html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500 hover:bg-emerald-600 shadow-inner' : 'bg-white hover:bg-slate-50'} transition-colors cursor-pointer flex flex-col justify-between">
-        <span class="text-xs font-bold ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(dateStr)}</span>
-        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1"><span class="font-bold text-white">${shift.type}</span></div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
-    </div>`;
-}
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500 hover:bg-emerald-600 shadow-inner' : 'bg-white hover:bg-slate-50'} ${isToday ? 'today-highlight' : ''} transition-colors cursor-pointer flex flex-col justify-between relative">
+                        <span class="text-xs font-bold relative z-20 ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(dateStr)}</span>
+                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span></div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
+                </div>`;
+            }
             html += `</div></div>`;
             container.innerHTML = html;
         }
@@ -1345,7 +1395,7 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                     <div class="space-y-6">
                         <div class="flex items-center justify-between" data-html2canvas-ignore>
                             <div>
-                                <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen & Statistiken</h4>
+                                <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen</h4>
                             </div>
                             <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
