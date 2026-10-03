@@ -1002,8 +1002,8 @@ for (let day = 1; day <= lastDay.getDate(); day++) {
                         startTime: data.start,
                         endTime: data.end,
                         duration: durationStr,
-                        department: data.dept || 'Intensivmedizin',
-                        location: data.loc || 'Station A',
+                        department: data.dept || '',
+                        location: data.loc || '',
                         deleted: false
                     });
                 }
