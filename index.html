@@ -52,33 +52,26 @@
         }
     </style>
 </head>
-<body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+<body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden flex flex-col">
 
-    <div id="app" class="min-h-full flex flex-col relative">
+    <div id="app" class="min-h-full flex flex-col relative flex-1">
 
-        <div id="global-spinner" class="fixed inset-0 z-90 bg-slate-950/50 backdrop-blur-xs hidden flex items-center justify-center">
-            <div class="bg-white p-6 rounded-2xl shadow-2xl flex items-center space-x-4 border border-slate-100">
-                <svg class="w-8 h-8 text-indigo-600 spinner" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span class="text-sm font-semibold text-slate-700">Wird geladen...</span>
-            </div>
-        </div>
+        <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
+            <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
 
-        <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-tr from-slate-950 via-indigo-950 to-slate-900 overflow-hidden">
-            <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
-            <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-emerald-600/15 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
-
-            <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20 mx-4">
-                <div class="flex flex-col items-center mb-8">
-                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-3 shadow-inner">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-md">
+                        <!-- 1. SVG შეცვლილია შესვლის გვერდზე -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                         </svg>
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
-                    <p class="text-xs text-slate-500 mt-1">Medizinisches Schichtmanagement</p>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
+                        <p class="text-xs text-slate-500">Medizinisches Schichtmanagement</p>
+                    </div>
                 </div>
 
                 <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
@@ -96,7 +89,7 @@
 
                     <button type="submit" id="login-submit-btn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                         <span>Anmelden</span>
                     </button>
@@ -105,7 +98,8 @@
         </div>
 
         <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
-            <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-xs">
+            <!-- 2. Header-სა და Main-ს დამატებული აქვს კიდეებიდან ზუსტი 0.5 სმ დაშორება -->
+            <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
                 <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
                     <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md group-hover:bg-indigo-700 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -116,13 +110,13 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <div class="bg-slate-100 p-1 rounded-xl flex space-x-1 border border-slate-200">
+                    <div class="bg-slate-200/70 p-1 rounded-xl flex space-x-1 border border-slate-300/50">
                         <button onclick="setCalendarMode('weekly')" id="mode-weekly" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Woche</button>
                         <button onclick="setCalendarMode('monthly')" id="mode-monthly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Monat</button>
                         <button onclick="setCalendarMode('yearly')" id="mode-yearly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Jahr</button>
                     </div>
 
-                    <button onclick="openSettingsModal()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-200 focus:outline-none" title="Einstellungen">
+                    <button onclick="openSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-200 focus:outline-none shadow-xs" title="Einstellungen">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -131,18 +125,18 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-6 max-w-7xl mx-auto w-full flex flex-col">
+            <main class="flex-1 px-[0.5cm] py-6 w-full flex flex-col">
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
                         <p id="calendar-subtitle" class="text-sm text-slate-500 mt-0.5">Wochentage vertikal, Zeiten horizontal von 00:00 bis 23:30 Uhr</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors">
+                        <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                         </button>
-                        <button onclick="goToCurrentDate()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold rounded-xl text-slate-700 transition-colors">Heute</button>
-                        <button onclick="changeDateRange(1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors">
+                        <button onclick="goToCurrentDate()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold rounded-xl text-slate-700 transition-colors shadow-xs">Heute</button>
+                        <button onclick="changeDateRange(1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </button>
                     </div>
@@ -154,139 +148,156 @@
             </main>
         </div>
 
-        <div id="shift-detail-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-[50px]">
-            <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
-                <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
-                            <p class="text-xs text-slate-500">Vollständige Informationen zum ausgewählten medizinischen Einsatz</p>
-                        </div>
-                    </div>
-                    <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-                <div id="shift-detail-content" class="flex-1 p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-[1cm]">
-            <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
-                <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
-                            <p class="text-xs text-slate-500">Verwaltung von Schichten und Zusatzfunktionen</p>
-                        </div>
-                    </div>
-                    <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <div class="flex-1 flex overflow-hidden">
-                    <div class="w-72 bg-slate-50 border-r border-slate-200 p-4 flex flex-col space-y-2">
-                        <button onclick="switchSettingsTab('add')" id="tab-btn-add" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            <span>Schicht hinzufügen</span>
-                        </button>
-                        <button onclick="switchSettingsTab('delete')" id="tab-btn-delete" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            <span>Schicht löschen</span>
-                        </button>
-                        <button onclick="switchSettingsTab('edit')" id="tab-btn-edit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            <span>Schicht bearbeiten</span>
-                        </button>
-                        <button onclick="switchSettingsTab('extra')" id="tab-btn-extra" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span>Zusätzliche Funktionen</span>
-                        </button>
-                    </div>
-
-                    <div class="flex-1 p-8 overflow-y-auto bg-white" id="settings-tab-content">
-                        <!-- Loaded dynamically -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="delete-confirm-modal" class="fixed inset-0 z-60 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                    <h4 class="font-bold text-slate-900">Schicht löschen bestätigen</h4>
-                </div>
-                <div id="delete-confirm-content" class="p-6 space-y-3">
-                    <!-- Populated dynamically -->
-                </div>
-                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                    <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                    <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Ja, löschen</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="restore-confirm-modal" class="fixed inset-0 z-60 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                    <h4 class="font-bold text-slate-900">Schicht wiederherstellen bestätigen</h4>
-                </div>
-                <div class="p-6 space-y-3">
-                    <p class="text-sm text-slate-600">Möchten Sie diese gelöschte Schicht wirklich wiederherstellen?</p>
-                </div>
-                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                    <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                    <button onclick="executeRestoreShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="edit-shift-modal" class="fixed inset-0 z-60 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                    <h4 class="font-bold text-slate-900">Schicht bearbeiten</h4>
-                    <button onclick="closeEditShiftModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-                <div id="edit-shift-content" class="p-6 space-y-4">
-                    <!-- Populated dynamically -->
-                </div>
-                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                    <button onclick="closeEditShiftModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                    <button onclick="saveEditedShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Änderungen speichern</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="move-date-modal" class="fixed inset-0 z-70 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                    <h4 class="font-bold text-slate-900">Auf welchen Tag verschieben?</h4>
-                </div>
-                <div class="p-6 space-y-4">
-                    <label class="block text-xs font-semibold text-slate-600 uppercase">Neues Datum auswählen</label>
-                    <input type="date" id="move-target-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
-                </div>
-                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                    <button onclick="closeMoveDateModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                    <button onclick="confirmMoveShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Verschieben</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
-
     </div>
+
+    <!-- 3. Z-Index შესწორებულია z-[100] და ფონი დამატებით დაბლარულია backdrop-blur-md -->
+    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-950/50 backdrop-blur-md hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl flex items-center space-x-4 border border-slate-100">
+            <svg class="w-8 h-8 text-indigo-600 spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-sm font-semibold text-slate-700">Authentifizierung wird durchgeführt...</span>
+        </div>
+    </div>
+
+    <!-- 3. z-[60] + backdrop-blur-md -->
+    <div id="shift-detail-modal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[50px]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
+            <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
+                        <p class="text-xs text-slate-500">Vollständige Informationen zum ausgewählten medizinischen Einsatz</p>
+                    </div>
+                </div>
+                <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="shift-detail-content" class="flex-1 p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. z-[50] + backdrop-blur-md -->
+    <div id="settings-modal" class="fixed inset-0 z-[50] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[1cm]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
+            <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
+                        <p class="text-xs text-slate-500">Verwaltung von Schichten und Zusatzfunktionen</p>
+                    </div>
+                </div>
+                <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden">
+                <div class="w-72 bg-slate-50 border-r border-slate-200 p-4 flex flex-col space-y-2">
+                    <button onclick="switchSettingsTab('add')" id="tab-btn-add" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Schicht hinzufügen</span>
+                    </button>
+                    <button onclick="switchSettingsTab('delete')" id="tab-btn-delete" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span>Schicht löschen</span>
+                    </button>
+                    <button onclick="switchSettingsTab('edit')" id="tab-btn-edit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <span>Schicht bearbeiten</span>
+                    </button>
+                    <button onclick="switchSettingsTab('extra')" id="tab-btn-extra" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span>Zusätzliche Funktionen</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 p-8 overflow-y-auto bg-white" id="settings-tab-content">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. z-[70] და backdrop-blur-md (პარამეტრების z-[50]-ის ზემოთ ჩნდება) -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">Schicht löschen bestätigen</h4>
+            </div>
+            <div id="delete-confirm-content" class="p-6 space-y-3">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Ja, löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. z-[75] -->
+    <div id="restore-confirm-modal" class="fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">Schicht wiederherstellen bestätigen</h4>
+            </div>
+            <div class="p-6 space-y-3">
+                <p class="text-sm text-slate-600">Möchten Sie diese gelöschte Schicht wirklich wiederherstellen?</p>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="executeRestoreShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. z-[80] და backdrop-blur-md (პარამეტრების z-[50]-ის ზემოთ ჩნდება) -->
+    <div id="edit-shift-modal" class="fixed inset-0 z-[80] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h4 class="font-bold text-slate-900">Schicht bearbeiten</h4>
+                <button onclick="closeEditShiftModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="edit-shift-content" class="p-6 space-y-4">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeEditShiftModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="saveEditedShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Änderungen speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. z-[90] -->
+    <div id="move-date-modal" class="fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">Auf welchen Tag verschieben?</h4>
+            </div>
+            <div class="p-6 space-y-4">
+                <label class="block text-xs font-semibold text-slate-600 uppercase">Neues Datum auswählen</label>
+                <input type="date" id="move-target-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeMoveDateModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="confirmMoveShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Verschieben</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col space-y-3 pointer-events-none"></div>
 
     <script>
         let appState = {
@@ -336,7 +347,7 @@
             addShiftRangeEnd: '',
             selectedAddDates: [],
             addedShiftTimesData: {},
-            addShiftStep: 'dates', // 'dates' or 'times'
+            addShiftStep: 'dates', 
             deleteModeActive: false,
             selectedDeleteDate: null,
             filterMode: 'monthly',
@@ -496,7 +507,6 @@
             return new Date(d.setDate(diff));
         }
 
-        // Weekly calendar with vertical days and horizontal 30-min time slots (00:00 to 23:30)
         function renderWeeklyCalendar(container) {
             const monday = getMonday(appState.currentDate);
             let days = [];
@@ -513,12 +523,13 @@
                 times.push(String(h).padStart(2, '0') + ':30');
             }
 
-            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1400px] flex flex-col h-full">`;
-            html += `<div class="grid grid-cols-[160px_repeat(48,minmax(28px,1fr))] border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
+            // 4. სიგანე გაიზარდა მინიმუმ 1800px-მდე და უჯრების მინიმალური ზომა 34px-მდე, რათა დროები დაეტიოს
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1800px] flex flex-col h-full">`;
+            html += `<div class="grid grid-cols-[160px_repeat(48,minmax(34px,1fr))] border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
             html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center">Wochentag</div>`;
-            times.forEach((t, tIdx) => {
+            times.forEach((t) => {
                 const isHour = t.endsWith(':00');
-                html += `<div class="p-2 text-center border-r border-slate-200 last:border-r-0 text-[10px] font-semibold text-slate-500">${isHour ? t : ''}</div>`;
+                html += `<div class="p-2 text-center border-r border-slate-200 last:border-r-0 text-[10px] font-semibold text-slate-500 truncate">${isHour ? t : ''}</div>`;
             });
             html += `</div>`;
 
@@ -527,37 +538,44 @@
                 const formattedDate = formatDate(d);
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
 
-                html += `<div class="grid grid-cols-[160px_repeat(48,minmax(28px,1fr))] border-b border-slate-100 h-[75px] items-center relative">`;
+                html += `<div class="grid grid-cols-[160px_repeat(48,minmax(34px,1fr))] border-b border-slate-100 h-[75px] items-center">`;
                 html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center h-full">
                     <span class="text-xs font-bold text-indigo-600">${dayNames[idx]}</span>
                     <span class="text-[11px] text-slate-500">${formattedDate}</span>
                 </div>`;
 
-                // Render 48 empty slot cells
-                for (let i = 0; i < 48; i++) {
-                    html += `<div class="border-r border-slate-100 last:border-r-0 h-full hover:bg-slate-50/40 transition-colors"></div>`;
+                let slotIndex = 0;
+                while (slotIndex < 48) {
+                    const shiftInSlot = dayShifts.find(shift => {
+                        const [sh, sm] = shift.startTime.split(':').map(Number);
+                        const sSlot = sh * 2 + (sm >= 30 ? 1 : 0);
+                        return sSlot === slotIndex;
+                    });
+
+                    if (shiftInSlot) {
+                        const [sh, sm] = shiftInSlot.startTime.split(':').map(Number);
+                        const [eh, em] = shiftInSlot.endTime.split(':').map(Number);
+                        const startSlot = sh * 2 + (sm >= 30 ? 1 : 0);
+                        const endSlot = eh * 2 + (em >= 30 ? 1 : 0);
+                        const spanSlots = Math.max(1, endSlot - startSlot);
+
+                        const colStart = startSlot + 2; 
+                        const colEnd = colStart + spanSlots;
+
+                        // 4. ტექსტის truncate უზრუნველყოფს, რომ წარწერები უჯრებს არ გასცდეს
+                        html += `<div onclick="openShiftDetail('${shiftInSlot.id}')" style="grid-column: ${colStart} / ${colEnd};" class="mx-1 my-2 bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden h-[55px]">
+                            <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
+                                <span class="truncate">${shiftInSlot.startTime}-${shiftInSlot.endTime}</span>
+                                <span class="bg-indigo-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shiftInSlot.type}</span>
+                            </div>
+                            <div class="text-[10px] font-medium truncate">${shiftInSlot.department}</div>
+                        </div>`;
+                        slotIndex += spanSlots;
+                    } else {
+                        html += `<div class="border-r border-slate-100 last:border-r-0 h-full hover:bg-slate-50/40 transition-colors"></div>`;
+                        slotIndex++;
+                    }
                 }
-
-                // Overlay shift blocks proportionally
-                dayShifts.forEach(shift => {
-                    const [sh, sm] = shift.startTime.split(':').map(Number);
-                    const [eh, em] = shift.endTime.split(':').map(Number);
-                    
-                    const startSlot = sh * 2 + (sm >= 30 ? 1 : 0);
-                    const endSlot = eh * 2 + (em >= 30 ? 1 : 0);
-                    const spanSlots = Math.max(1, endSlot - startSlot);
-                    
-                    const gridColStart = startSlot + 2; // +2 because label is col 1 (1-based index)
-                    const gridColEnd = gridColStart + spanSlots;
-
-                    html += `<div onclick="openShiftDetail('${shift.id}')" style="grid-column: ${gridColStart} / ${gridColEnd};" class="absolute top-2 bottom-2 bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20">
-                        <div class="flex items-center justify-between text-[11px] font-semibold">
-                            <span>${shift.startTime} - ${shift.endTime}</span>
-                            <span class="bg-indigo-500 px-1.5 py-0.5 rounded text-[10px]">${shift.type}</span>
-                        </div>
-                        <div class="text-[11px] font-medium truncate">${shift.department} (${shift.location})</div>
-                    </div>`;
-                });
 
                 html += `</div>`;
             });
@@ -566,7 +584,6 @@
             container.innerHTML = html;
         }
 
-        // Fully filled monthly calendar
         function renderMonthlyCalendar(container) {
             const year = appState.currentDate.getFullYear();
             const month = appState.currentDate.getMonth();
@@ -590,9 +607,10 @@
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
+                const hasShift = dayShifts.length > 0;
 
-                html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col justify-between">
-                    <div class="text-xs font-bold text-slate-700">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                html += `<div class="p-2.5 min-h-[110px] ${hasShift ? 'bg-indigo-50/70 border border-indigo-200 shadow-inner' : 'bg-white hover:bg-slate-50'} transition-colors flex flex-col justify-between">
+                    <div class="text-xs font-bold ${hasShift ? 'text-indigo-900' : 'text-slate-700'}">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
                     <div class="space-y-1 overflow-y-auto max-h-[90px]">`;
                 dayShifts.forEach(shift => {
                     html += `<div onclick="openShiftDetail('${shift.id}')" class="text-[11px] bg-indigo-600 text-white p-1.5 rounded-lg font-medium cursor-pointer shadow-xs hover:bg-indigo-700 transition-all flex flex-col">
@@ -600,7 +618,7 @@
                         <span class="text-[10px] text-indigo-100">${shift.type} (${shift.location})</span>
                     </div>`;
                 });
-                if(dayShifts.length === 0) {
+                if(!hasShift) {
                     html += `<div class="text-[10px] text-slate-300 italic pt-2">Keine Schicht</div>`;
                 }
                 html += `</div></div>`;
@@ -609,7 +627,6 @@
             container.innerHTML = html;
         }
 
-        // Full 12-month calendar overview for year mode where clicking a shift opens details
         function renderYearlyCalendar(container) {
             const year = appState.currentDate.getFullYear();
             const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -716,7 +733,6 @@
             else if (tabName === 'extra') renderExtraFunctionsTab(contentArea);
         }
 
-        // TAB 1: ADD SHIFT (with in-panel step for time configuration to avoid popup stacking issues)
         function renderAddShiftTab(container) {
             if (appState.addShiftStep === 'times') {
                 renderAddShiftTimesStep(container);
@@ -869,6 +885,12 @@
                 val = val.substring(0, 2) + ':' + val.substring(2, 4);
             }
             e.target.value = val;
+            
+            if (field === 'start' && val.length === 5) {
+                const endInput = document.getElementById(`time-end-${dateStr}`);
+                if (endInput) endInput.focus();
+            }
+
             updateAddedShiftData(dateStr);
         }
 
@@ -955,7 +977,6 @@
             switchSettingsTab('add');
         }
 
-        // TAB 2: DELETE SHIFT
         function renderDeleteShiftTab(container) {
             const year = appState.currentDate.getFullYear();
             const month = appState.currentDate.getMonth();
@@ -1047,7 +1068,6 @@
             switchSettingsTab('delete');
         }
 
-        // TAB 3: EDIT SHIFT
         let currentEditingShiftId = null;
         function renderEditShiftTab(container) {
             const year = appState.currentDate.getFullYear();
@@ -1182,7 +1202,6 @@
             switchSettingsTab('edit');
         }
 
-        // TAB 4: EXTRAS & STATISTICS & PDF DOWNLOAD
         function renderExtraFunctionsTab(container) {
             let activeShifts = appState.shifts.filter(s => !s.deleted);
             const now = new Date();
@@ -1248,7 +1267,7 @@
                         <div class="space-y-2 max-h-[200px] overflow-y-auto">
                             ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
                                 <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-                                    <span>${formatDate(s.date)} - ${s.type} (${s.startTime} - ${s.endTime})</span>
+                                    <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
                                     <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-indigo-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
                                 </div>
                             `).join('')}
