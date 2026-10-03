@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShogiDienste Schichtplaner</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Libraries for PDF and Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -52,7 +65,6 @@
     <div id="app" class="min-h-full flex flex-col relative flex-1">
 
         <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
-            <!-- 2. Particles.js კონტეინერი -->
             <div id="particles-js" class="absolute inset-0 z-0"></div>
             
             <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
@@ -60,7 +72,7 @@
 
             <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
                 <div class="flex items-center space-x-3 mb-8">
-                    <!-- 1. SVG-ს უკანა ფონი მოშორებულია, ლოგოს ფერი შეიცვალა -->
+                    <!-- SVG ohne blauen Hintergrund -->
                     <div class="w-12 h-12 flex items-center justify-center text-indigo-600">
                         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -68,7 +80,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
-                        <p class="text-xs text-slate-500">Medizinisches Schichtmanagement</p>
+                        <!-- Untertext entfernt -->
                     </div>
                 </div>
 
@@ -98,10 +110,10 @@
         <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
             <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
                 <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md group-hover:bg-indigo-700 transition-colors">
-                        <!-- 3. ShogiDienste-ს წინ ახალი SVG აიქონი (კალენდარი) -->
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    <!-- SVG ohne blauen Hintergrund, exakt wie auf der Login-Seite -->
+                    <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-800 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-slate-900 tracking-tight">ShogiDienste</span>
@@ -127,7 +139,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
-                        <p id="calendar-subtitle" class="text-sm text-slate-500 mt-0.5">Wochentage vertikal, Zeiten horizontal von 00:00 bis 23:30 Uhr</p>
+                        <!-- Text entfernt -->
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
@@ -148,14 +160,13 @@
 
     </div>
 
-    <!-- 4. შეცვლილი Loading Circle-ის დიზაინი -->
-    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-md hidden items-center justify-center">
-        <div class="relative flex items-center justify-center w-16 h-16">
-            <!-- უკანა გამჭვირვალე რგოლი -->
-            <div class="absolute inset-0 border-4 border-emerald-200 rounded-full"></div>
-            <!-- მბრუნავი მწვანე რგოლი -->
-            <div class="absolute inset-0 border-4 border-emerald-600 rounded-full border-t-transparent animate-spin"></div>
+    <!-- Neuer Spinner -->
+    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-50/80 backdrop-blur-xl hidden flex-col items-center justify-center">
+        <div class="relative w-16 h-16 mb-4">
+            <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
         </div>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">Wird geladen...</span>
     </div>
 
     <!-- Modals (Shift Detail) -->
@@ -168,7 +179,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
-                        <p class="text-xs text-slate-500">Vollständige Informationen zum ausgewählten medizinischen Einsatz</p>
+                        <!-- Text entfernt -->
                     </div>
                 </div>
                 <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
@@ -191,7 +202,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
-                        <p class="text-xs text-slate-500">Verwaltung von Schichten und Zusatzfunktionen</p>
+                        <!-- Text entfernt -->
                     </div>
                 </div>
                 <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
@@ -219,7 +230,7 @@
                     </button>
                 </div>
 
-                <div class="flex-1 p-8 overflow-y-auto bg-white" id="settings-tab-content">
+                <div class="flex-1 p-8 overflow-y-auto bg-slate-50" id="settings-tab-content">
                     <!-- Loaded dynamically -->
                 </div>
             </div>
@@ -294,48 +305,26 @@
     <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col space-y-3 pointer-events-none"></div>
 
     <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEbSWfiZ6xGL7_NoVVFpy-JkGwebb78RQ",
+            authDomain: "using-6af8b.firebaseapp.com",
+            databaseURL: "https://using-6af8b-default-rtdb.firebaseio.com",
+            projectId: "using-6af8b",
+            storageBucket: "using-6af8b.firebasestorage.app",
+            messagingSenderId: "316715965452",
+            appId: "1:316715965452:web:8a07ffdf5905a571cc2229",
+            measurementId: "G-XNXV9CRKEG"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const shiftsRef = db.ref('shogidienste/shifts');
+
         let appState = {
             isLoggedIn: false,
             calendarMode: 'weekly',
             currentDate: new Date(),
-            shifts: [
-                {
-                    id: 's1',
-                    date: '2026-10-05',
-                    day: 'Montag',
-                    type: 'Frühdienst',
-                    startTime: '07:00',
-                    endTime: '15:30',
-                    duration: '8h 30m',
-                    department: 'Intensivmedizin',
-                    location: 'Station A',
-                    deleted: false
-                },
-                {
-                    id: 's2',
-                    date: '2026-10-06',
-                    day: 'Dienstag',
-                    type: 'Spätdienst',
-                    startTime: '14:00',
-                    endTime: '22:00',
-                    duration: '8h 00m',
-                    department: 'Chirurgie',
-                    location: 'OP-Trakt',
-                    deleted: false
-                },
-                {
-                    id: 's3',
-                    date: '2026-10-08',
-                    day: 'Donnerstag',
-                    type: 'Nachtdienst',
-                    startTime: '22:00',
-                    endTime: '06:00',
-                    duration: '8h 00m',
-                    department: 'Notaufnahme',
-                    location: 'ZNA',
-                    deleted: false
-                }
-            ],
+            shifts: [],
             deletedShifts: [],
             addShiftRangeStart: '',
             addShiftRangeEnd: '',
@@ -345,10 +334,32 @@
             deleteModeActive: false,
             selectedDeleteDate: null,
             filterMode: 'monthly',
-            pendingRestoreIndex: null
+            pendingRestoreIndex: null,
+            currentTab: 'add'
         };
 
-        // 2. Particles.js ანიმაციის ინიციალიზაცია
+        // Realtime Data Sync from Firebase
+        shiftsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            appState.shifts = data ? Object.values(data) : [];
+            appState.deletedShifts = appState.shifts.filter(s => s.deleted);
+            
+            if (appState.isLoggedIn) {
+                renderCalendar();
+                const settingsModal = document.getElementById('settings-modal');
+                if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                    switchSettingsTab(appState.currentTab);
+                }
+            }
+        });
+
+        function saveToFirebase() {
+            shiftsRef.set(appState.shifts);
+        }
+
+        // Chart.js instance
+        let shiftChartInstance = null;
+
         document.addEventListener('DOMContentLoaded', function() {
             particlesJS('particles-js', {
                 particles: {
@@ -500,21 +511,17 @@
         function renderCalendar() {
             const container = document.getElementById('calendar-container');
             const titleEl = document.getElementById('calendar-title');
-            const subtitleEl = document.getElementById('calendar-subtitle');
 
             container.innerHTML = '';
 
             if (appState.calendarMode === 'weekly') {
                 titleEl.textContent = 'Wochenübersicht';
-                subtitleEl.textContent = 'Wochentage vertikal, Zeiten horizontal von 00:00 bis 23:30 Uhr';
                 renderWeeklyCalendar(container);
             } else if (appState.calendarMode === 'monthly') {
                 titleEl.textContent = 'Monatsübersicht';
-                subtitleEl.textContent = 'Vollständig ausgefüllte Monatsansicht';
                 renderMonthlyCalendar(container);
             } else {
                 titleEl.textContent = 'Jahresübersicht';
-                subtitleEl.textContent = 'Vollständige Jahreskalenderübersicht (Klick auf Schichttag öffnet Details)';
                 renderYearlyCalendar(container);
             }
         }
@@ -537,13 +544,13 @@
 
             const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
             
-            // 5. ამოღებულია გამოტოვებული უჯრები. თითო საათი იკავებს ორ სვეტს (`col-span-2`)
-            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[2400px] flex flex-col h-full">`;
-            html += `<div class="grid grid-cols-[160px_repeat(48,minmax(45px,1fr))] border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
-            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center">Wochentag</div>`;
+            // Layout mit exakt 1 Zelle = 1 Stunde (24 Spalten) und absoluter Positionierung für feine Zeiten
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col h-full">`;
+            html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-10" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
+            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center"></div>`;
             for (let h = 0; h < 24; h++) {
                 const timeStr = String(h).padStart(2, '0') + ':00';
-                html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500" style="grid-column: span 2;">${timeStr}</div>`;
+                html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500">${timeStr}</div>`;
             }
             html += `</div>`;
 
@@ -552,46 +559,47 @@
                 const formattedDate = formatDate(d);
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
 
-                html += `<div class="grid grid-cols-[160px_repeat(48,minmax(45px,1fr))] border-b border-slate-100 h-[75px] items-center">`;
-                html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center h-full">
+                html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
+                
+                // Day Label
+                html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center h-full z-10" style="grid-row: 1; grid-column: 1;">
                     <span class="text-xs font-bold text-emerald-600">${dayNames[idx]}</span>
                     <span class="text-[11px] text-slate-500">${formattedDate}</span>
                 </div>`;
 
-                let slotIndex = 0;
-                while (slotIndex < 48) {
-                    const shiftInSlot = dayShifts.find(shift => {
-                        const [sh, sm] = shift.startTime.split(':').map(Number);
-                        const sSlot = sh * 2 + (sm >= 30 ? 1 : 0);
-                        return sSlot === slotIndex;
-                    });
-
-                    if (shiftInSlot) {
-                        const [sh, sm] = shiftInSlot.startTime.split(':').map(Number);
-                        const [eh, em] = shiftInSlot.endTime.split(':').map(Number);
-                        const startSlot = sh * 2 + (sm >= 30 ? 1 : 0);
-                        const endSlot = eh * 2 + (em >= 30 ? 1 : 0);
-                        const spanSlots = Math.max(1, endSlot - startSlot);
-
-                        const colStart = startSlot + 2; 
-                        const colEnd = colStart + spanSlots;
-
-                        // 6. ფერები შეიცვალა emerald-ით
-                        html += `<div onclick="openShiftDetail('${shiftInSlot.id}')" style="grid-column: ${colStart} / ${colEnd};" class="mx-1 my-2 bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden h-[55px]">
-                            <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
-                                <span class="truncate">${shiftInSlot.startTime}-${shiftInSlot.endTime}</span>
-                                <span class="bg-emerald-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shiftInSlot.type}</span>
-                            </div>
-                            <div class="text-[10px] font-medium truncate">${shiftInSlot.department}</div>
-                        </div>`;
-                        slotIndex += spanSlots;
-                    } else {
-                        html += `<div class="border-r border-slate-100 last:border-r-0 h-full hover:bg-slate-50/40 transition-colors"></div>`;
-                        slotIndex++;
-                    }
+                // 24 Empty Background Cells
+                for (let i = 0; i < 24; i++) {
+                    html += `<div class="border-r border-slate-100 h-full w-full" style="grid-row: 1; grid-column: ${i + 2};"></div>`;
                 }
 
-                html += `</div>`;
+                // Overlay Container for Absolute Shifts
+                html += `<div style="grid-row: 1; grid-column: 2 / span 24;" class="relative w-full h-full pointer-events-none">`;
+                
+                dayShifts.forEach(shift => {
+                    const [sh, sm] = shift.startTime.split(':').map(Number);
+                    const [eh, em] = shift.endTime.split(':').map(Number);
+                    
+                    let startMins = sh * 60 + sm;
+                    let endMins = eh * 60 + em;
+                    if (endMins <= startMins) endMins += 24 * 60; // Overnight
+                    
+                    let visualEndMins = endMins > 24 * 60 ? 24 * 60 : endMins;
+                    let durationMins = visualEndMins - startMins;
+
+                    const leftPerc = (startMins / (24 * 60)) * 100;
+                    const widthPerc = (durationMins / (24 * 60)) * 100;
+
+                    html += `<div onclick="openShiftDetail('${shift.id}')" style="left: ${leftPerc}%; width: ${widthPerc}%;" class="absolute top-2.5 h-[55px] bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden pointer-events-auto">
+                        <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
+                            <span class="truncate">${shift.startTime}-${shift.endTime}</span>
+                            <span class="bg-emerald-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shift.type}</span>
+                        </div>
+                        <div class="text-[10px] font-medium truncate">${shift.department}</div>
+                    </div>`;
+                });
+                
+                html += `</div>`; // End overlay
+                html += `</div>`; // End day row
             });
             html += `</div></div>`;
 
@@ -624,7 +632,6 @@
                 const hasShift = dayShifts.length > 0;
 
                 if (hasShift) {
-                    // 6. ფერები შეიცვალა emerald-ით
                     html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer" onclick="openShiftDetail('${dayShifts[0].id}')">
                         <div class="text-xs font-bold text-white mb-2">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
                         <div class="space-y-2 overflow-y-auto max-h-[90px]">`;
@@ -674,7 +681,6 @@
                     const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
                     
                     if (shift) {
-                        // 6. ფერები შეიცვალა emerald-ით
                         html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs" title="${shift.type} (${shift.startTime}-${shift.endTime})">${d}</div>`;
                     } else {
                         html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100">${d}</div>`;
@@ -728,7 +734,7 @@
         function openSettingsModal() {
             document.getElementById('settings-modal').classList.remove('hidden');
             appState.addShiftStep = 'dates';
-            switchSettingsTab('add');
+            switchSettingsTab(appState.currentTab);
         }
 
         function closeSettingsModal() {
@@ -737,6 +743,7 @@
         }
 
         function switchSettingsTab(tabName) {
+            appState.currentTab = tabName;
             ['add', 'delete', 'edit', 'extra'].forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
                 if (t === tabName) {
@@ -768,7 +775,6 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h4 class="text-lg font-bold text-slate-900">Schichten hinzufügen</h4>
-                            <p class="text-xs text-slate-500 mt-0.5">Wählen Sie den Datumsbereich und legen Sie die Zeiten fest</p>
                         </div>
                         <button onclick="goToAddTimesStep()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Zeiten festlegen</button>
                     </div>
@@ -863,7 +869,6 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h4 class="text-lg font-bold text-slate-900">Zeiten für ausgewählte Tage festlegen</h4>
-                            <p class="text-xs text-slate-500 mt-0.5">Geben Sie die Arbeitszeiten ein (Doppelpunkt wird automatisch gesetzt)</p>
                         </div>
                         <button onclick="appState.addShiftStep = 'dates'; switchSettingsTab('add');" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Zurück zur Kalenderauswahl</button>
                     </div>
@@ -878,7 +883,6 @@
                         <div class="w-40 font-bold text-xs text-slate-800 leading-tight">${formatDetailDate(dateStr)}</div>
                         <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         
-                        <!-- 7. დაემატა Abteilung input ველად (გახდა 5 სვეტიანი grid) -->
                         <div class="flex-1 grid grid-cols-5 gap-2">
                             <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="07:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
                             <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="15:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
@@ -930,12 +934,12 @@
             const startInput = document.getElementById(`time-start-${dateStr}`);
             const endInput = document.getElementById(`time-end-${dateStr}`);
             const locInput = document.getElementById(`loc-${dateStr}`);
-            const deptInput = document.getElementById(`dept-${dateStr}`); // 7. Abteilung Field
+            const deptInput = document.getElementById(`dept-${dateStr}`);
             
             const start = startInput ? startInput.value : '';
             const end = endInput ? endInput.value : '';
-            const loc = locInput ? locInput.value : 'Station A';
-            const dept = deptInput ? deptInput.value : 'Intensivmedizin';
+            const loc = locInput ? locInput.value : '';
+            const dept = deptInput ? deptInput.value : '';
             
             const calculatedType = autoCalculateShiftType(start);
 
@@ -1001,6 +1005,7 @@
             appState.addedShiftTimesData = {};
             appState.addShiftStep = 'dates';
             showToast('Schichten erfolgreich hinzugefügt.', 'info');
+            saveToFirebase(); // Firebase Sync
             switchSettingsTab('add');
         }
 
@@ -1089,6 +1094,7 @@
                 shift.deleted = true;
                 appState.deletedShifts.push(shift);
                 showToast('Schicht erfolgreich gelöscht.', 'info');
+                saveToFirebase(); // Firebase Sync
             }
             closeDeleteConfirmModal();
             appState.deleteModeActive = false;
@@ -1201,6 +1207,7 @@
 
             closeEditShiftModal();
             showToast('Schicht erfolgreich aktualisiert.', 'info');
+            saveToFirebase(); // Firebase Sync
             switchSettingsTab('edit');
         }
 
@@ -1223,10 +1230,50 @@
                 shift.date = targetDate;
                 shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
                 showToast(`Schicht erfolgreich auf ${formatDate(targetDate)} verschoben.`, 'info');
+                saveToFirebase(); // Firebase Sync
             }
             closeMoveDateModal();
             closeEditShiftModal();
             switchSettingsTab('edit');
+        }
+
+        function initChart(labels, dataPoints) {
+            const canvas = document.getElementById('shiftChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            if (shiftChartInstance) {
+                shiftChartInstance.destroy();
+            }
+
+            shiftChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Arbeitsstunden',
+                        data: dataPoints,
+                        backgroundColor: '#059669', // emerald-600
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Stunden' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Datum' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
         }
 
         function renderExtraFunctionsTab(container) {
@@ -1252,57 +1299,132 @@
                 });
             }
 
+            // Exakte Berechnung in Stunden
+            let sortedShifts = [...activeShifts].sort((a,b) => new Date(a.date) - new Date(b.date));
+            let totalHoursExact = 0;
+            let chartDataAgg = {};
+
+            sortedShifts.forEach(s => {
+                const [sh, sm] = s.startTime.split(':').map(Number);
+                const [eh, em] = s.endTime.split(':').map(Number);
+                let mins = (eh * 60 + em) - (sh * 60 + sm);
+                if (mins < 0) mins += 24 * 60; 
+                let hrs = mins / 60;
+                
+                totalHoursExact += hrs;
+
+                let label = formatDate(s.date);
+                if (chartDataAgg[label]) chartDataAgg[label] += hrs;
+                else chartDataAgg[label] = hrs;
+            });
+
+            let chartLabels = Object.keys(chartDataAgg);
+            let chartDataPoints = Object.values(chartDataAgg);
+
             const totalDays = activeShifts.length;
-            const totalHours = totalDays * 8;
+            totalHoursExact = Math.round(totalHoursExact * 10) / 10;
+
+            let genTime = new Date().toLocaleString('de-DE', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
 
             let html = `
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen & Statistiken</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">Umfassende Berichte und Exportoptionen</p>
+                <div id="pdf-report-area" class="bg-white p-2 rounded-xl">
+                    <div class="hidden pdf-only-header mb-6 pb-4 border-b border-slate-200">
+                        <h2 class="text-2xl font-bold text-slate-900">ShogiDienste Schichtbericht</h2>
+                        <p class="text-sm text-slate-500 mt-1">Generiert am: ${genTime} Uhr</p>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs font-semibold text-slate-600 uppercase">Filter:</span>
-                            <select onchange="appState.filterMode = this.value; switchSettingsTab('extra');" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
-                                <option value="all" ${appState.filterMode === 'all' ? 'selected' : ''}>Alle</option>
-                                <option value="weekly" ${appState.filterMode === 'weekly' ? 'selected' : ''}>Diese Woche</option>
-                                <option value="monthly" ${appState.filterMode === 'monthly' ? 'selected' : ''}>Diesen Monat</option>
-                                <option value="yearly" ${appState.filterMode === 'yearly' ? 'selected' : ''}>Dieses Jahr</option>
-                            </select>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between" data-html2canvas-ignore>
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen & Statistiken</h4>
+                            </div>
+                            <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span>Als PDF exportieren</span>
+                            </button>
                         </div>
-                        <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>PDF herunterladen</span>
-                        </button>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200" data-html2canvas-ignore>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs font-semibold text-slate-600 uppercase">Filter:</span>
+                                <select onchange="appState.filterMode = this.value; switchSettingsTab('extra');" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
+                                    <option value="all" ${appState.filterMode === 'all' ? 'selected' : ''}>Alle</option>
+                                    <option value="weekly" ${appState.filterMode === 'weekly' ? 'selected' : ''}>Diese Woche</option>
+                                    <option value="monthly" ${appState.filterMode === 'monthly' ? 'selected' : ''}>Diesen Monat</option>
+                                    <option value="yearly" ${appState.filterMode === 'yearly' ? 'selected' : ''}>Dieses Jahr</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Schichttage</span>
+                                <div class="text-2xl font-bold text-slate-900 mt-1">${totalDays}</div>
+                            </div>
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
+                                <div class="text-2xl font-bold text-emerald-600 mt-1">${totalHoursExact} Std</div>
+                            </div>
+                        </div>
+
                         <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                            <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Schichttage</span>
-                            <div class="text-2xl font-bold text-slate-900 mt-1">${totalDays}</div>
+                            <h5 class="text-xs font-semibold text-slate-600 uppercase mb-4">Arbeitsstunden Verlauf</h5>
+                            <div class="w-full h-64">
+                                ${chartLabels.length > 0 ? '<canvas id="shiftChart"></canvas>' : '<div class="h-full flex items-center justify-center text-sm text-slate-400">Keine Daten verfügbar</div>'}
+                            </div>
                         </div>
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                            <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
-                            <div class="text-2xl font-bold text-emerald-600 mt-1">~${totalHours} Std</div>
-                        </div>
-                    </div>
 
-                    <div class="space-y-3">
-                        <h5 class="text-sm font-bold text-slate-800">Gelöschte Schichten (${appState.deletedShifts.length})</h5>
-                        <div class="space-y-2 max-h-[200px] overflow-y-auto">
-                            ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
-                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-                                    <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
-                                    <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-emerald-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
-                                </div>
-                            `).join('')}
+                        <!-- Detaillierte Tabelle für PDF -->
+                        <div class="hidden pdf-only-table mt-8">
+                            <h5 class="text-lg font-bold text-slate-800 mb-4">Schichtdetails (${sortedShifts.length})</h5>
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="border-b-2 border-slate-800">
+                                        <th class="py-2 px-1">Datum</th>
+                                        <th class="py-2 px-1">Zeit</th>
+                                        <th class="py-2 px-1">Typ</th>
+                                        <th class="py-2 px-1">Abteilung / Ort</th>
+                                        <th class="py-2 px-1">Dauer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sortedShifts.map(s => `
+                                        <tr class="border-b border-slate-200">
+                                            <td class="py-2 px-1 font-medium">${formatDate(s.date)}</td>
+                                            <td class="py-2 px-1">${s.startTime} -${s.endTime}</td>
+                                            <td class="py-2 px-1">${s.type}</td>
+                                            <td class="py-2 px-1">${s.department} /${s.location}</td>
+                                            <td class="py-2 px-1">${s.duration}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="space-y-3" data-html2canvas-ignore>
+                            <h5 class="text-sm font-bold text-slate-800">Gelöschte Schichten (${appState.deletedShifts.length})</h5>
+                            <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                                ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
+                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                                        <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
+                                        <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-emerald-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
             container.innerHTML = html;
+
+            if (chartLabels.length > 0) {
+                setTimeout(() => {
+                    initChart(chartLabels, chartDataPoints);
+                }, 100);
+            }
         }
 
         function promptRestoreShift(index) {
@@ -1321,36 +1443,50 @@
                 shift.deleted = false;
                 appState.shifts.push(shift);
                 showToast('Schicht erfolgreich wiederhergestellt.', 'info');
+                saveToFirebase(); // Firebase Sync
             }
             closeRestoreConfirmModal();
             switchSettingsTab('extra');
         }
 
-        function downloadPDFReport() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(18);
-            doc.text("ShogiDienste - Schichtbericht", 14, 20);
+        async function downloadPDFReport() {
+            showToast('PDF wird generiert, bitte warten...', 'info');
+            const element = document.getElementById('pdf-report-area');
             
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(11);
-            doc.text(`Generiert am: ${new Date().toLocaleDateString('de-DE')}`, 14, 28);
+            const pdfHeader = element.querySelector('.pdf-only-header');
+            const pdfTable = element.querySelector('.pdf-only-table');
             
-            let y = 40;
-            doc.setFont("Helvetica", "bold");
-            doc.text("Aktive Schichten:", 14, y);
-            y += 8;
-            
-            doc.setFont("Helvetica", "normal");
-            appState.shifts.filter(s => !s.deleted).forEach(s => {
-                if (y > 270) { doc.addPage(); y = 20; }
-                doc.text(`- ${s.day}, ${formatDate(s.date)}: ${s.type} (${s.startTime} - ${s.endTime}), Ort: ${s.location}, Abt: ${s.department}`, 14, y);
-                y += 7;
-            });
-            
-            doc.save("ShogiDienste_Schichtbericht.pdf");
-            showToast('PDF-Bericht erfolgreich heruntergeladen.', 'info');
+            if(pdfHeader) pdfHeader.classList.remove('hidden');
+            if(pdfTable) pdfTable.classList.remove('hidden');
+
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                if(pdfHeader) pdfHeader.classList.add('hidden');
+                if(pdfTable) pdfTable.classList.add('hidden');
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
+                pdf.save(`ShogiDienste_Report_${formatDate(new Date())}.pdf`);
+                
+                showToast('PDF erfolgreich exportiert!', 'info');
+            } catch(e) {
+                console.error(e);
+                showToast('Fehler bei der PDF Generierung', 'error');
+                
+                if(pdfHeader) pdfHeader.classList.add('hidden');
+                if(pdfTable) pdfTable.classList.add('hidden');
+            }
         }
     </script>
 </body>
