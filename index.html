@@ -6,6 +6,8 @@
     <title>ShogiDienste Schichtplaner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -29,13 +31,6 @@
         .toast-slide {
             animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .spinner {
-            animation: spin 0.8s linear infinite;
-        }
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -57,14 +52,17 @@
     <div id="app" class="min-h-full flex flex-col relative flex-1">
 
         <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
+            <!-- 2. Particles.js კონტეინერი -->
+            <div id="particles-js" class="absolute inset-0 z-0"></div>
+            
             <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
             <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
 
             <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
                 <div class="flex items-center space-x-3 mb-8">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-md">
-                        <!-- 1. SVG შეცვლილია შესვლის გვერდზე -->
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 1. SVG-ს უკანა ფონი მოშორებულია, ლოგოს ფერი შეიცვალა -->
+                    <div class="w-12 h-12 flex items-center justify-center text-indigo-600">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                         </svg>
                     </div>
@@ -98,12 +96,12 @@
         </div>
 
         <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
-            <!-- 2. Header-სა და Main-ს დამატებული აქვს კიდეებიდან ზუსტი 0.5 სმ დაშორება -->
             <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
                 <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
                     <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md group-hover:bg-indigo-700 transition-colors">
+                        <!-- 3. ShogiDienste-ს წინ ახალი SVG აიქონი (კალენდარი) -->
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-slate-900 tracking-tight">ShogiDienste</span>
@@ -150,18 +148,17 @@
 
     </div>
 
-    <!-- 3. Z-Index შესწორებულია z-[100] და ფონი დამატებით დაბლარულია backdrop-blur-md -->
-    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-950/50 backdrop-blur-md hidden flex items-center justify-center">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl flex items-center space-x-4 border border-slate-100">
-            <svg class="w-8 h-8 text-indigo-600 spinner" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span class="text-sm font-semibold text-slate-700">Authentifizierung wird durchgeführt...</span>
+    <!-- 4. შეცვლილი Loading Circle-ის დიზაინი -->
+    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-md hidden items-center justify-center">
+        <div class="relative flex items-center justify-center w-16 h-16">
+            <!-- უკანა გამჭვირვალე რგოლი -->
+            <div class="absolute inset-0 border-4 border-emerald-200 rounded-full"></div>
+            <!-- მბრუნავი მწვანე რგოლი -->
+            <div class="absolute inset-0 border-4 border-emerald-600 rounded-full border-t-transparent animate-spin"></div>
         </div>
     </div>
 
-    <!-- 3. z-[60] + backdrop-blur-md -->
+    <!-- Modals (Shift Detail) -->
     <div id="shift-detail-modal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[50px]">
         <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
             <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -184,13 +181,13 @@
         </div>
     </div>
 
-    <!-- 3. z-[50] + backdrop-blur-md -->
+    <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 z-[50] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[1cm]">
         <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
             <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
@@ -229,7 +226,7 @@
         </div>
     </div>
 
-    <!-- 5. z-[70] და backdrop-blur-md (პარამეტრების z-[50]-ის ზემოთ ჩნდება) -->
+    <!-- Confirm Modals -->
     <div id="delete-confirm-modal" class="fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -245,7 +242,6 @@
         </div>
     </div>
 
-    <!-- 3. z-[75] -->
     <div id="restore-confirm-modal" class="fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -256,12 +252,11 @@
             </div>
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
                 <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="executeRestoreShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
+                <button onclick="executeRestoreShift()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
             </div>
         </div>
     </div>
 
-    <!-- 6. z-[80] და backdrop-blur-md (პარამეტრების z-[50]-ის ზემოთ ჩნდება) -->
     <div id="edit-shift-modal" class="fixed inset-0 z-[80] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
@@ -280,7 +275,6 @@
         </div>
     </div>
 
-    <!-- 3. z-[90] -->
     <div id="move-date-modal" class="fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -354,6 +348,27 @@
             pendingRestoreIndex: null
         };
 
+        // 2. Particles.js ანიმაციის ინიციალიზაცია
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 60, density: { enable: true, value_area: 800 } },
+                    color: { value: "#4f46e5" }, 
+                    shape: { type: "circle" },
+                    opacity: { value: 0.3, random: false },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#4f46e5", opacity: 0.2, width: 1 },
+                    move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
+                },
+                retina_detect: true
+            });
+        });
+
         function formatDate(dateObj) {
             const d = new Date(dateObj);
             const day = String(d.getDate()).padStart(2, '0');
@@ -365,7 +380,7 @@
         function formatDetailDate(dateStr) {
             const d = new Date(dateStr);
             const weekday = d.toLocaleDateString('de-DE', { weekday: 'long' });
-            return `${weekday}, ${formatDate(d)}`;
+            return `${formatDate(d)}, ${weekday}`;
         }
 
         function handleLogin(e) {
@@ -403,9 +418,11 @@
 
             const spinner = document.getElementById('global-spinner');
             spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
 
             setTimeout(() => {
                 spinner.classList.add('hidden');
+                spinner.style.display = 'none';
                 appState.isLoggedIn = true;
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-app-view').classList.remove('hidden');
@@ -417,8 +434,10 @@
         function refreshMainView() {
             const spinner = document.getElementById('global-spinner');
             spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
             setTimeout(() => {
                 spinner.classList.add('hidden');
+                spinner.style.display = 'none';
                 appState.currentDate = new Date();
                 renderCalendar();
                 showToast('Ansicht aktualisiert.', 'info');
@@ -517,20 +536,15 @@
             }
 
             const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
-            const times = [];
-            for (let h = 0; h < 24; h++) {
-                times.push(String(h).padStart(2, '0') + ':00');
-                times.push(String(h).padStart(2, '0') + ':30');
-            }
-
-            // 4. სიგანე გაიზარდა მინიმუმ 1800px-მდე და უჯრების მინიმალური ზომა 34px-მდე, რათა დროები დაეტიოს
-            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1800px] flex flex-col h-full">`;
-            html += `<div class="grid grid-cols-[160px_repeat(48,minmax(34px,1fr))] border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
+            
+            // 5. ამოღებულია გამოტოვებული უჯრები. თითო საათი იკავებს ორ სვეტს (`col-span-2`)
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[2400px] flex flex-col h-full">`;
+            html += `<div class="grid grid-cols-[160px_repeat(48,minmax(45px,1fr))] border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
             html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center">Wochentag</div>`;
-            times.forEach((t) => {
-                const isHour = t.endsWith(':00');
-                html += `<div class="p-2 text-center border-r border-slate-200 last:border-r-0 text-[10px] font-semibold text-slate-500 truncate">${isHour ? t : ''}</div>`;
-            });
+            for (let h = 0; h < 24; h++) {
+                const timeStr = String(h).padStart(2, '0') + ':00';
+                html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500" style="grid-column: span 2;">${timeStr}</div>`;
+            }
             html += `</div>`;
 
             days.forEach((d, idx) => {
@@ -538,9 +552,9 @@
                 const formattedDate = formatDate(d);
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
 
-                html += `<div class="grid grid-cols-[160px_repeat(48,minmax(34px,1fr))] border-b border-slate-100 h-[75px] items-center">`;
+                html += `<div class="grid grid-cols-[160px_repeat(48,minmax(45px,1fr))] border-b border-slate-100 h-[75px] items-center">`;
                 html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center h-full">
-                    <span class="text-xs font-bold text-indigo-600">${dayNames[idx]}</span>
+                    <span class="text-xs font-bold text-emerald-600">${dayNames[idx]}</span>
                     <span class="text-[11px] text-slate-500">${formattedDate}</span>
                 </div>`;
 
@@ -562,11 +576,11 @@
                         const colStart = startSlot + 2; 
                         const colEnd = colStart + spanSlots;
 
-                        // 4. ტექსტის truncate უზრუნველყოფს, რომ წარწერები უჯრებს არ გასცდეს
-                        html += `<div onclick="openShiftDetail('${shiftInSlot.id}')" style="grid-column: ${colStart} / ${colEnd};" class="mx-1 my-2 bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden h-[55px]">
+                        // 6. ფერები შეიცვალა emerald-ით
+                        html += `<div onclick="openShiftDetail('${shiftInSlot.id}')" style="grid-column: ${colStart} / ${colEnd};" class="mx-1 my-2 bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden h-[55px]">
                             <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
                                 <span class="truncate">${shiftInSlot.startTime}-${shiftInSlot.endTime}</span>
-                                <span class="bg-indigo-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shiftInSlot.type}</span>
+                                <span class="bg-emerald-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shiftInSlot.type}</span>
                             </div>
                             <div class="text-[10px] font-medium truncate">${shiftInSlot.department}</div>
                         </div>`;
@@ -609,19 +623,24 @@
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
                 const hasShift = dayShifts.length > 0;
 
-                html += `<div class="p-2.5 min-h-[110px] ${hasShift ? 'bg-indigo-50/70 border border-indigo-200 shadow-inner' : 'bg-white hover:bg-slate-50'} transition-colors flex flex-col justify-between">
-                    <div class="text-xs font-bold ${hasShift ? 'text-indigo-900' : 'text-slate-700'}">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
-                    <div class="space-y-1 overflow-y-auto max-h-[90px]">`;
-                dayShifts.forEach(shift => {
-                    html += `<div onclick="openShiftDetail('${shift.id}')" class="text-[11px] bg-indigo-600 text-white p-1.5 rounded-lg font-medium cursor-pointer shadow-xs hover:bg-indigo-700 transition-all flex flex-col">
-                        <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
-                        <span class="text-[10px] text-indigo-100">${shift.type} (${shift.location})</span>
+                if (hasShift) {
+                    // 6. ფერები შეიცვალა emerald-ით
+                    html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer" onclick="openShiftDetail('${dayShifts[0].id}')">
+                        <div class="text-xs font-bold text-white mb-2">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="space-y-2 overflow-y-auto max-h-[90px]">`;
+                    dayShifts.forEach(shift => {
+                        html += `<div class="text-[11px] text-white flex flex-col leading-tight border-t border-emerald-400/50 pt-1 first:border-0 first:pt-0">
+                            <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
+                            <span class="text-[10px] text-emerald-100">${shift.type} (${shift.location})</span>
+                        </div>`;
+                    });
+                    html += `</div></div>`;
+                } else {
+                    html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col">
+                        <div class="text-xs font-bold text-slate-700">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="text-[10px] text-slate-300 italic pt-2">Keine Schicht</div>
                     </div>`;
-                });
-                if(!hasShift) {
-                    html += `<div class="text-[10px] text-slate-300 italic pt-2">Keine Schicht</div>`;
                 }
-                html += `</div></div>`;
             }
             html += `</div>`;
             container.innerHTML = html;
@@ -640,7 +659,7 @@
                 const lastD = new Date(year, mIdx + 1, 0);
                 
                 html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col">
-                    <div class="font-bold text-indigo-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
+                    <div class="font-bold text-emerald-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
                     <div class="grid grid-cols-7 text-[10px] text-slate-400 font-semibold text-center mb-1">
                         <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
                     </div>
@@ -655,7 +674,8 @@
                     const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
                     
                     if (shift) {
-                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs" title="${shift.type} (${shift.startTime}-${shift.endTime})">${d}</div>`;
+                        // 6. ფერები შეიცვალა emerald-ით
+                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs" title="${shift.type} (${shift.startTime}-${shift.endTime})">${d}</div>`;
                     } else {
                         html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100">${d}</div>`;
                     }
@@ -679,7 +699,7 @@
                 </div>
                 <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Schichttyp</span>
-                    <span class="text-lg font-bold text-indigo-600 mt-1">${shift.type}</span>
+                    <span class="text-lg font-bold text-emerald-600 mt-1">${shift.type}</span>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Start- und Endzeit</span>
@@ -852,17 +872,21 @@
             `;
 
             appState.selectedAddDates.forEach(dateStr => {
-                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: 'Intensivmedizin', loc: 'Station A' };
+                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: '', loc: '' };
                 html += `
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-4">
-                        <div class="w-32 font-bold text-sm text-slate-800">${formatDate(dateStr)}</div>
+                        <div class="w-40 font-bold text-xs text-slate-800 leading-tight">${formatDetailDate(dateStr)}</div>
                         <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        <div class="flex-1 grid grid-cols-4 gap-2">
+                        
+                        <!-- 7. დაემატა Abteilung input ველად (გახდა 5 სვეტიანი grid) -->
+                        <div class="flex-1 grid grid-cols-5 gap-2">
                             <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="07:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
                             <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="15:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <div class="flex items-center text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100" id="type-badge-${dateStr}">${existingTime.type}</div>
-                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort / Abt." oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <div class="flex items-center justify-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-xl border border-emerald-100 text-center" id="type-badge-${dateStr}">${existingTime.type}</div>
+                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="dept-${dateStr}" value="${existingTime.dept}" placeholder="Abteilung" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
                         </div>
+                        
                         <button onclick="removeAddedDateIfNoTime('${dateStr}')" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Tag entfernen">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
@@ -906,17 +930,20 @@
             const startInput = document.getElementById(`time-start-${dateStr}`);
             const endInput = document.getElementById(`time-end-${dateStr}`);
             const locInput = document.getElementById(`loc-${dateStr}`);
+            const deptInput = document.getElementById(`dept-${dateStr}`); // 7. Abteilung Field
             
             const start = startInput ? startInput.value : '';
             const end = endInput ? endInput.value : '';
             const loc = locInput ? locInput.value : 'Station A';
+            const dept = deptInput ? deptInput.value : 'Intensivmedizin';
+            
             const calculatedType = autoCalculateShiftType(start);
 
             const badge = document.getElementById(`type-badge-${dateStr}`);
             if(badge) badge.textContent = calculatedType;
 
             if (start && end) {
-                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept: 'Intensivmedizin', loc };
+                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept, loc };
             } else {
                 delete appState.addedShiftTimesData[dateStr];
             }
@@ -964,8 +991,8 @@
                         startTime: data.start,
                         endTime: data.end,
                         duration: durationStr,
-                        department: data.dept,
-                        location: data.loc,
+                        department: data.dept || 'Intensivmedizin',
+                        location: data.loc || 'Station A',
                         deleted: false
                     });
                 }
@@ -1099,9 +1126,9 @@
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
 
-                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 bg-white hover:bg-indigo-50/40 transition-colors cursor-pointer flex flex-col justify-between">
+                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 bg-white hover:bg-emerald-50/40 transition-colors cursor-pointer flex flex-col justify-between">
                     <span class="text-xs font-bold text-slate-700">${formatDate(dateStr)}</span>
-                    ${shift ? `<div class="text-[10px] bg-indigo-50 text-indigo-700 p-1 rounded font-medium truncate">${shift.type}</div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
+                    ${shift ? `<div class="text-[10px] bg-emerald-50 text-emerald-700 p-1 rounded font-medium truncate">${shift.type}</div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
                 </div>`;
             }
             html += `</div></div>`;
@@ -1119,7 +1146,7 @@
             content.innerHTML = `
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Datum</label>
-                    <input type="text" disabled value="${formatDate(shift.date)}" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500">
+                    <input type="text" disabled value="${formatDetailDate(shift.date)}" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -1258,7 +1285,7 @@
                         </div>
                         <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
                             <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
-                            <div class="text-2xl font-bold text-indigo-600 mt-1">~${totalHours} Std</div>
+                            <div class="text-2xl font-bold text-emerald-600 mt-1">~${totalHours} Std</div>
                         </div>
                     </div>
 
@@ -1268,7 +1295,7 @@
                             ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
                                 <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
                                     <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
-                                    <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-indigo-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
+                                    <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-emerald-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
                                 </div>
                             `).join('')}
                         </div>
