@@ -1,237 +1,1326 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="de" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zebra Label Print</title>
-    
-    <!-- Flatpickr ბიბლიოთეკის ჩართვა (კალენდრის და დროის 24-სთ ფორმატისთვის) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
+    <title>ShogiDienste Schichtplaner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include jsPDF library for strict PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* =========================================
-           1. ეკრანის (UI) დიზაინი
-           ========================================= */
-        :root {
-            --bg-body: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --input-bg: #f8fafc;
-            --btn-bg: #0f172a;
-            --btn-hover: #334155;
-            --focus-ring: #3b82f6;
-        }
-
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
-
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 32px 28px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
+        @keyframes floatBg {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
         }
-
-        .header-title {
-            font-size: 22px;
-            font-weight: 700;
-            text-align: center;
-            margin: 0 0 24px 0;
-            letter-spacing: -0.5px;
+        .floating-shape-1 {
+            animation: floatBg 8s ease-in-out infinite;
         }
-
-        .input-wrapper {
-            margin-bottom: 20px;
+        .floating-shape-2 {
+            animation: floatBg 12s ease-in-out infinite reverse;
         }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
-        textarea, input {
-            width: 100%;
-            padding: 12px 14px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: inherit;
-            color: var(--text-main);
-            box-sizing: border-box;
-            transition: all 0.2s ease;
+        .toast-slide {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        textarea:focus, input:focus {
-            outline: none;
-            background-color: #ffffff;
-            border-color: var(--focus-ring);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        .spinner {
+            animation: spin 0.8s linear infinite;
         }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            margin-top: 8px;
-            background-color: var(--btn-bg);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: background-color 0.2s ease, transform 0.1s;
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        button:hover {
-            background-color: var(--btn-hover);
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-
-        button:active {
-            transform: scale(0.98);
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
         }
-
-        button svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2.2;
-        }
-
-        /* =========================================
-           2. ბეჭდვის კონფიგურაცია (Zebra)
-           ========================================= */
-        #print-wrapper { display: none; }
-
-        @media print {
-            .app-container { display: none !important; }
-
-            /* ბრაუზერის კიდეების გაუქმება */
-            @page { margin: 0; }
-
-            /* ტექსტი მკაცრად ზედა ცენტრში */
-            body, html {
-                margin: 0 !important;
-                padding: 0 !important;
-                background-color: white !important;
-                
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important; /* მაგრდება ზედა კიდეზე */
-                align-items: center !important;         /* სწორდება შუაგულში (ცენტრში) */
-                height: 100vh !important;
-                width: 100vw !important;
-            }
-
-            #print-wrapper {
-                display: block !important;
-                width: 100% !important;
-                text-align: center !important;
-                padding-top: 1mm !important; /* უმცირესი დაშორება ზემოდან */
-                margin: 0 !important;
-            }
-
-            #print-name {
-                font-size: 10pt !important; 
-                font-weight: bold;
-                line-height: 1.1;
-                margin: 0 0 2px 0 !important;
-                color: black !important;
-                word-wrap: break-word;
-            }
-
-            #print-time {
-                font-size: 8pt !important; 
-                margin: 0 !important;
-                color: black !important;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body>
+<body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
-<div class="app-container">
-    <h2 class="header-title">ლეიბლის ბეჭდვა</h2>
-    
-    <div class="input-wrapper">
-        <label>მედიკამენტი</label>
-        <textarea id="med-name" placeholder="ჩაწერეთ დასახელება..." oninput="updatePreview()"></textarea>
+    <div id="app" class="min-h-full flex flex-col relative">
+
+        <!-- GLOBAL LOADING SPINNER OVERLAY -->
+        <div id="global-spinner" class="fixed inset-0 z-90 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl flex items-center space-x-4 border border-slate-100">
+                <svg class="w-8 h-8 text-indigo-600 spinner" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-sm font-semibold text-slate-700">Wird geladen...</span>
+            </div>
+        </div>
+
+        <!-- AUTHENTICATION VIEW -->
+        <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 overflow-hidden">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
+
+            <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 mx-4">
+                <div class="flex flex-col items-center mb-8">
+                    <!-- SVG Lock Vector Icon -->
+                    <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-4 shadow-inner">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-slate-900">Anmelden</h1>
+                    <p class="text-sm text-slate-500 mt-1">Authentifizierung erforderlich</p>
+                </div>
+
+                <form id="login-form" class="space-y-6" onsubmit="handleLogin(event)">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Benutzername</label>
+                            <!-- SVG Vector next to username label -->
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <input type="text" id="username-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="alex">
+                        <span id="username-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Passwort</label>
+                        <input type="password" id="password-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="2911">
+                        <span id="password-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
+                    </div>
+
+                    <button type="submit" id="login-submit-btn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center space-x-2">
+                        <span>Anmelden</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MAIN APPLICATION VIEW (Hidden initially) -->
+        <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
+            <!-- Header -->
+            <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-xs">
+                <div class="flex items-center space-x-3 cursor-pointer group" onclick="resetMainView()">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md group-hover:bg-indigo-700 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-slate-900 tracking-tight">ShogiDienste</span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Mode Selector -->
+                    <div class="bg-slate-100 p-1 rounded-xl flex space-x-1 border border-slate-200">
+                        <button onclick="setCalendarMode('weekly')" id="mode-weekly" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Woche</button>
+                        <button onclick="setCalendarMode('monthly')" id="mode-monthly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Monat</button>
+                        <button onclick="setCalendarMode('yearly')" id="mode-yearly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Jahr</button>
+                    </div>
+
+                    <!-- Settings Parameter Button -->
+                    <button onclick="openSettingsModal()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-200 focus:outline-none" title="Einstellungen">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Central Section: Shift Management Calendar -->
+            <main class="flex-1 p-6 max-w-7xl mx-auto w-full flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
+                        <p id="calendar-subtitle" class="text-sm text-slate-500 mt-0.5">Tage vertikal, Zeiten horizontal im Stundenraster</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button onclick="goToCurrentDate()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold rounded-xl text-slate-700 transition-colors">Heute</button>
+                        <button onclick="changeDateRange(1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar View Container -->
+                <div id="calendar-container" class="flex-1 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+                    <!-- Dynamic calendar content rendered by JS -->
+                </div>
+            </main>
+        </div>
+
+        <!-- SHIFT DETAIL FULLSCREEN POPUP -->
+        <div id="shift-detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-[50px]">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
+                <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
+                            <p class="text-xs text-slate-500">Vollständige Informationen zum ausgewählten Einsatz</p>
+                        </div>
+                    </div>
+                    <!-- Close button (ONLY way to close popup) -->
+                    <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="shift-detail-content" class="flex-1 p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS / PARAMETERS MODAL -->
+        <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-[1cm]">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
+                <!-- Header -->
+                <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Einstellungen & Parameter</h3>
+                            <p class="text-xs text-slate-500">Verwaltung von Schichten und Zusatzfunktionen</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Body with Left Vertical Menu -->
+                <div class="flex-1 flex overflow-hidden">
+                    <div class="w-72 bg-slate-50 border-r border-slate-200 p-4 flex flex-col space-y-2">
+                        <button onclick="switchSettingsTab('add')" id="tab-btn-add" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Schicht hinzufügen</span>
+                        </button>
+                        <button onclick="switchSettingsTab('delete')" id="tab-btn-delete" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Schicht löschen</span>
+                        </button>
+                        <button onclick="switchSettingsTab('edit')" id="tab-btn-edit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            <span>Schicht bearbeiten</span>
+                        </button>
+                        <button onclick="switchSettingsTab('extra')" id="tab-btn-extra" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span>Zusätzliche Funktionen</span>
+                        </button>
+                    </div>
+
+                    <div class="flex-1 p-8 overflow-y-auto bg-white" id="settings-tab-content">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB POPUP FOR TIMES IN "SCHICHT HINZUFÜGEN" (Stacked correctly behind/in front as modal) -->
+        <div id="times-sub-modal" class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <h4 class="font-bold text-slate-900">Zeiten für ausgewählte Tage festlegen</h4>
+                    <button onclick="closeTimesSubModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="times-sub-content" class="p-6 overflow-y-auto flex-1 space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                    <button onclick="closeTimesSubModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Speichern</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB POPUP FOR DELETE CONFIRMATION (Stacked) -->
+        <div id="delete-confirm-modal" class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                    <h4 class="font-bold text-slate-900">Schicht löschen bestätigen</h4>
+                </div>
+                <div id="delete-confirm-content" class="p-6 space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                    <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                    <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Ja, löschen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB POPUP FOR RESTORATION CONFIRMATION -->
+        <div id="restore-confirm-modal" class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                    <h4 class="font-bold text-slate-900">Schicht wiederherstellen bestätigen</h4>
+                </div>
+                <div class="p-6 space-y-3">
+                    <p class="text-sm text-slate-600">Möchten Sie diese gelöschte Schicht wirklich wiederherstellen?</p>
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                    <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                    <button onclick="executeRestoreShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB POPUP FOR EDIT / MOVE SHIFT (Stacked) -->
+        <div id="edit-shift-modal" class="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h4 class="font-bold text-slate-900">Schicht bearbeiten</h4>
+                    <button onclick="closeEditShiftModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="edit-shift-content" class="p-6 space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                    <button onclick="closeEditShiftModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                    <button onclick="saveEditedShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Änderungen speichern</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB POPUP FOR MOVE DATE PICKER (Stacked) -->
+        <div id="move-date-modal" class="fixed inset-0 z-70 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-12">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                    <h4 class="font-bold text-slate-900">Auf welchen Tag verschieben?</h4>
+                </div>
+                <div class="p-6 space-y-4">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase">Neues Datum auswählen</label>
+                    <input type="date" id="move-target-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                </div>
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                    <button onclick="closeMoveDateModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                    <button onclick="confirmMoveShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Verschieben</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST NOTIFICATION CONTAINER (Bottom-Right) -->
+        <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
     </div>
-    
-    <div class="input-wrapper">
-        <label>თარიღი და დრო</label>
-        <!-- აქ აღარ არის datetime-local, იყენებს სპეციალურ 24სთ-იან კალენდარს -->
-        <input type="text" id="med-time" placeholder="აირჩიეთ დრო">
-    </div>
-    
-    <button onclick="window.print()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-        </svg>
-        ბეჭდვა
-    </button>
-</div>
 
-<!-- ბლოკი რომელიც დაიბეჭდება -->
-<div id="print-wrapper">
-    <div id="print-name">მედიკამენტი</div>
-    <div id="print-time"></div>
-</div>
+    <script>
+        // State Management
+        let appState = {
+            isLoggedIn: false,
+            calendarMode: 'weekly', // 'weekly', 'monthly', 'yearly'
+            currentDate: new Date(),
+            shifts: [
+                {
+                    id: 's1',
+                    date: '2026-10-05', // YYYY-MM-DD
+                    day: 'Montag',
+                    type: 'Frühdienst',
+                    startTime: '06:00',
+                    endTime: '14:30',
+                    duration: '8h 30m',
+                    department: 'Entwicklung',
+                    location: 'Büro A',
+                    deleted: false
+                },
+                {
+                    id: 's2',
+                    date: '2026-10-06',
+                    day: 'Dienstag',
+                    type: 'Spätdienst',
+                    startTime: '14:00',
+                    endTime: '22:00',
+                    duration: '8h 00m',
+                    department: 'Support',
+                    location: 'Büro B',
+                    deleted: false
+                },
+                {
+                    id: 's3',
+                    date: '2026-10-08',
+                    day: 'Donnerstag',
+                    type: 'Nachtdienst',
+                    startTime: '22:00',
+                    endTime: '06:00',
+                    duration: '8h 00m',
+                    department: 'Operations',
+                    location: 'Serverraum',
+                    deleted: false
+                }
+            ],
+            deletedShifts: [],
+            addShiftRangeStart: '',
+            addShiftRangeEnd: '',
+            selectedAddDates: [],
+            addedShiftTimesData: {},
+            deleteModeActive: false,
+            selectedDeleteDate: null,
+            filterMode: 'monthly', // 'weekly', 'monthly', 'yearly', 'all'
+            pendingRestoreIndex: null
+        };
 
-<script>
-    // Flatpickr-ის ინიციალიზაცია 24-საათიანი ფორმატით
-    flatpickr("#med-time", {
-        enableTime: true,
-        time_24hr: true, // მკაცრად 24-საათიანი რეჟიმი (23:00 და არა 11:00 PM)
-        dateFormat: "d.m.Y | H:i", // ზუსტად ის ფორმატი, რაც უნდა დაიბეჭდოს
-        defaultDate: new Date(), // ნაგულისხმევად მიმდინარე დრო
-        onChange: function(selectedDates, dateStr, instance) {
-            updatePreview(); // დროის შეცვლისას ახლდება დასაბეჭდი ბლოკი
+        // Helper: Format Date as DD.MM.YYYY
+        function formatDate(dateObj) {
+            const d = new Date(dateObj);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
         }
-    });
 
-    function updatePreview() {
-        const name = document.getElementById('med-name').value.trim() || 'მედიკამენტი';
-        // Flatpickr ავტომატურად გვაძლევს მზა ტექსტს (მაგ: 15.05.2024 | 23:20)
-        const dateStr = document.getElementById('med-time').value;
-        
-        document.getElementById('print-name').innerText = name;
-        document.getElementById('print-time').innerText = dateStr;
-    }
+        function parseDateString(dateStr) {
+            // YYYY-MM-DD to Date
+            return new Date(dateStr);
+        }
 
-    // საწყისი განახლება
-    updatePreview();
-</script>
+        // Helper: Format Details as "Day, DD.MM.YYYY"
+        function formatDetailDate(dateStr) {
+            const d = new Date(dateStr);
+            const weekday = d.toLocaleDateString('de-DE', { weekday: 'long' });
+            return `${weekday}, ${formatDate(d)}`;
+        }
 
+        // Authentication Handler with loading spinner and inline errors (no ticker when field error exists)
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username-input');
+            const passwordInput = document.getElementById('password-input');
+            const userErr = document.getElementById('username-error');
+            const passErr = document.getElementById('password-error');
+
+            userErr.classList.add('hidden');
+            passErr.classList.add('hidden');
+
+            let hasError = false;
+            if (!usernameInput.value.trim()) {
+                userErr.textContent = 'Benutzername darf nicht leer sein.';
+                userErr.classList.remove('hidden');
+                hasError = true;
+            } else if (usernameInput.value.trim() !== 'alex') {
+                userErr.textContent = 'Ungültiger Benutzername.';
+                userErr.classList.remove('hidden');
+                hasError = true;
+            }
+
+            if (!passwordInput.value.trim()) {
+                passErr.textContent = 'Passwort darf nicht leer sein.';
+                passErr.classList.remove('hidden');
+                hasError = true;
+            } else if (passwordInput.value.trim() !== '2911') {
+                passErr.textContent = 'Ungültiges Passwort.';
+                passErr.classList.remove('hidden');
+                hasError = true;
+            }
+
+            if (hasError) {
+                // Rule 2: When inline field error exists, do not show ticker/toast error
+                return;
+            }
+
+            // Show loading circle spinner for async authentication transition
+            const spinner = document.getElementById('global-spinner');
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                appState.isLoggedIn = true;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('main-app-view').classList.remove('hidden');
+                showToast('Erfolgreich angemeldet.', 'info');
+                renderCalendar();
+            }, 800);
+        }
+
+        function resetMainView() {
+            appState.currentDate = new Date();
+            renderCalendar();
+            showToast('Ansicht aktualisiert.', 'info');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-5 py-4 rounded-xl shadow-xl border text-white font-medium text-sm toast-slide ${
+                type === 'error' ? 'bg-red-600 border-red-500' : 'bg-slate-900 border-slate-700'
+            }`;
+
+            const svgIcon = type === 'error' 
+                ? '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
+                : '<svg class="w-5 h-5 flex-shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+            toast.innerHTML = `${svgIcon}<span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function setCalendarMode(mode) {
+            appState.calendarMode = mode;
+            ['weekly', 'monthly', 'yearly'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all';
+                } else {
+                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+                }
+            });
+            renderCalendar();
+        }
+
+        function changeDateRange(direction) {
+            const d = new Date(appState.currentDate);
+            if (appState.calendarMode === 'weekly') {
+                d.setDate(d.getDate() + (direction * 7));
+            } else if (appState.calendarMode === 'monthly') {
+                d.setMonth(d.getMonth() + direction);
+            } else {
+                d.setFullYear(d.getFullYear() + direction);
+            }
+            appState.currentDate = d;
+            renderCalendar();
+        }
+
+        function goToCurrentDate() {
+            appState.currentDate = new Date();
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendar-container');
+            const titleEl = document.getElementById('calendar-title');
+            const subtitleEl = document.getElementById('calendar-subtitle');
+
+            container.innerHTML = '';
+
+            if (appState.calendarMode === 'weekly') {
+                titleEl.textContent = 'Wochenübersicht';
+                subtitleEl.textContent = 'Tage vertikal, Zeiten horizontal im Stundenraster';
+                renderWeeklyCalendar(container);
+            } else if (appState.calendarMode === 'monthly') {
+                titleEl.textContent = 'Monatsübersicht';
+                subtitleEl.textContent = 'Vollständig ausgefüllte Monatsansicht';
+                renderMonthlyCalendar(container);
+            } else {
+                titleEl.textContent = 'Jahresübersicht';
+                subtitleEl.textContent = 'Vollständige Jahreskalenderübersicht';
+                renderYearlyCalendar(container);
+            }
+        }
+
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6: 1);
+            return new Date(d.setDate(diff));
+        }
+
+        // Requirement 5: Weekly schedule with days vertically, times horizontally
+        function renderWeeklyCalendar(container) {
+            const monday = getMonday(appState.currentDate);
+            let days = [];
+            for (let i = 0; i < 7; i++) {
+                let tempD = new Date(monday);
+                tempD.setDate(monday.getDate() + i);
+                days.push(tempD);
+            }
+
+            const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+            const hours = [];
+            for (let h = 6; h <= 23; h++) {
+                hours.push(String(h).padStart(2, '0') + ':00');
+            }
+
+            // Header row with hours horizontally
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1100px] flex flex-col h-full">`;
+            html += `<div class="grid grid-cols-8 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">`;
+            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200">Wochentag</div>`;
+            hours.forEach(hourStr => {
+                html += `<div class="p-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500">${hourStr}</div>`;
+            });
+            html += `</div>`;
+
+            // Rows for each day vertically
+            days.forEach((d, idx) => {
+                const dateStr = d.toISOString().split('T')[0];
+                const formattedDate = formatDate(d);
+                html += `<div class="grid grid-cols-8 border-b border-slate-100 min-h-[75px] items-stretch">`;
+                html += `<div class="p-3 border-r border-slate-200 bg-slate-50/50 flex flex-col justify-center">
+                    <span class="text-xs font-bold text-indigo-600">${dayNames[idx]}</span>
+                    <span class="text-[11px] text-slate-500">${formattedDate}</span>
+                </div>`;
+
+                // Hour slots across
+                hours.forEach(hourStr => {
+                    const hourNum = parseInt(hourStr.split(':')[0], 10);
+                    const matchingShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr && parseInt(s.startTime.split(':')[0], 10) === hourNum);
+
+                    html += `<div class="p-1 border-r border-slate-100 last:border-r-0 relative hover:bg-slate-50/60 transition-colors flex items-center">`;
+                    matchingShifts.forEach(shift => {
+                        html += `<div onclick="openShiftDetail('${shift.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-xl shadow-xs cursor-pointer transition-all transform hover:scale-[1.02] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-[10px] font-semibold">
+                                <span>${shift.startTime}-${shift.endTime}</span>
+                                <span class="bg-indigo-500 px-1.5 py-0.5 rounded">${shift.type}</span>
+                            </div>
+                            <div class="text-[10px] font-medium truncate mt-0.5">${shift.department}</div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            });
+            html += `</div></div>`;
+
+            container.innerHTML = html;
+        }
+
+        // Requirement 8: Month schedule fully filled with shift cards
+        function renderMonthlyCalendar(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+            
+            let html = `<div class="p-4 bg-slate-50 border-b border-slate-200 text-center font-bold text-slate-800">${monthNames[month]} ${year}</div>`;
+            html += `<div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 text-center py-2">
+                <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
+            </div>`;
+
+            html += `<div class="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-slate-100">`;
+            
+            let startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDayOfWeek; i++) {
+                html += `<div class="bg-slate-50/30 p-2 min-h-[110px]"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
+
+                html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col justify-between">
+                    <div class="text-xs font-bold text-slate-700">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                    <div class="space-y-1 overflow-y-auto max-h-[90px]">`;
+                dayShifts.forEach(shift => {
+                    html += `<div onclick="openShiftDetail('${shift.id}')" class="text-[11px] bg-indigo-600 text-white p-1.5 rounded-lg font-medium cursor-pointer shadow-xs hover:bg-indigo-700 transition-all flex flex-col">
+                        <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
+                        <span class="text-[10px] text-indigo-100">${shift.type} (${shift.location})</span>
+                    </div>`;
+                });
+                if(dayShifts.length === 0) {
+                    html += `<div class="text-[10px] text-slate-300 italic pt-2">Keine Schicht</div>`;
+                }
+                html += `</div></div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // Requirement 9: Full 12-month calendar overview for year mode
+        function renderYearlyCalendar(container) {
+            const year = appState.currentDate.getFullYear();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `<div class="p-6 overflow-y-auto flex-1 space-y-8">`;
+            html += `<div class="text-center font-bold text-xl text-slate-800">Jahreskalender ${year}</div>`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">`;
+
+            monthNames.forEach((mName, mIdx) => {
+                const firstD = new Date(year, mIdx, 1);
+                const lastD = new Date(year, mIdx + 1, 0);
+                
+                html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col">
+                    <div class="font-bold text-indigo-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
+                    <div class="grid grid-cols-7 text-[10px] text-slate-400 font-semibold text-center mb-1">
+                        <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-[11px] text-center">`;
+
+                let startDow = firstD.getDay() === 0 ? 6 : firstD.getDay() - 1;
+                for (let i = 0; i < startDow; i++) {
+                    html += `<div></div>`;
+                }
+                for (let d = 1; d <= lastD.getDate(); d++) {
+                    const dStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
+                    html += `<div class="py-1 rounded ${hasShift ? 'bg-indigo-600 text-white font-bold' : 'text-slate-600 bg-white border border-slate-100'}">${d}</div>`;
+                }
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        // Requirement 7: Details formatted as: Day, Date
+        function openShiftDetail(shiftId) {
+            const shift = appState.shifts.find(s => s.id === shiftId);
+            if (!shift) return;
+
+            const formattedDetail = formatDetailDate(shift.date);
+            const content = document.getElementById('shift-detail-content');
+            content.innerHTML = `
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tag & Datum</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${formattedDetail}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Schichttyp</span>
+                    <span class="text-lg font-bold text-indigo-600 mt-1">${shift.type}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Start- und Endzeit</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.startTime} - ${shift.endTime}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Arbeitsdauer</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.duration}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abteilung</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.department}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Einsatzort</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.location}</span>
+                </div>
+            `;
+            document.getElementById('shift-detail-modal').classList.remove('hidden');
+        }
+
+        function closeShiftDetailModal() {
+            document.getElementById('shift-detail-modal').classList.add('hidden');
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            switchSettingsTab('add');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            renderCalendar();
+        }
+
+        function switchSettingsTab(tabName) {
+            ['add', 'delete', 'edit', 'extra'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left';
+                } else {
+                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left';
+                }
+            });
+
+            const contentArea = document.getElementById('settings-tab-content');
+            if (tabName === 'add') renderAddShiftTab(contentArea);
+            else if (tabName === 'delete') renderDeleteShiftTab(contentArea);
+            else if (tabName === 'edit') renderEditShiftTab(contentArea);
+            else if (tabName === 'extra') renderExtraFunctionsTab(contentArea);
+        }
+
+        // --- TAB 1: SCHICHT HINZUFÜGEN (Req 10 & 14: Permanent current month calendar with green-highlighted selected dates) ---
+        function renderAddShiftTab(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">Schichten hinzufügen</h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Wählen Sie den Datumsbereich und legen Sie die Zeiten fest</p>
+                        </div>
+                        <button id="open-times-sub-btn" onclick="openTimesSubModal()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Zeiten auswählen</button>
+                    </div>
+
+                    <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von Datum</label>
+                            <input type="date" id="add-start-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeStart}">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis Datum</label>
+                            <input type="date" id="add-end-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeEnd}">
+                        </div>
+                        <div class="pt-5">
+                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Bereich markieren</button>
+                        </div>
+                    </div>
+
+                    <!-- Permanent Current Month Calendar with green-highlighted selected dates -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden p-6 bg-slate-50/50">
+                        <div class="text-sm font-bold text-slate-800 mb-4">${monthNames[month]} ${year} (Ausgewählte Tage: ${appState.selectedAddDates.length})</div>
+                        <div class="grid grid-cols-7 text-xs font-semibold text-slate-400 text-center mb-2">
+                            <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isSelected = appState.selectedAddDates.includes(dStr);
+                html += `<div onclick="toggleDateSelection('${dStr}')" class="p-3 rounded-xl border text-center text-xs font-bold cursor-pointer transition-all ${
+                    isSelected ? 'bg-emerald-600 text-white border-emerald-700 shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                }">${day}</div>`;
+            }
+
+            html += `</div></div></div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleDateSelection(dateStr) {
+            if (appState.selectedAddDates.includes(dateStr)) {
+                appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
+            } else {
+                appState.selectedAddDates.push(dateStr);
+            }
+            switchSettingsTab('add');
+        }
+
+        function confirmDateRangeSelection() {
+            const start = document.getElementById('add-start-date').value;
+            const end = document.getElementById('add-end-date').value;
+            if (!start || !end) {
+                showToast('Bitte Start- und Enddatum auswählen.', 'error');
+                return;
+            }
+            appState.addShiftRangeStart = start;
+            appState.addShiftRangeEnd = end;
+
+            let startDate = new Date(start);
+            let endDate = new Date(end);
+            if (startDate > endDate) {
+                showToast('Das Startdatum darf nicht nach dem Enddatum liegen.', 'error');
+                return;
+            }
+
+            let dates = [];
+            let curr = new Date(startDate);
+            while (curr <= endDate) {
+                dates.push(curr.toISOString().split('T')[0]);
+                curr.setDate(curr.getDate() + 1);
+            }
+            appState.selectedAddDates = dates;
+            showToast(`${dates.length} Tage markiert.`, 'info');
+            switchSettingsTab('add');
+        }
+
+        // Requirement 12 & 13: Auto colon typing and automatic shift type calculation
+        function openTimesSubModal() {
+            if (appState.selectedAddDates.length === 0) return;
+            const content = document.getElementById('times-sub-content');
+            let html = '';
+
+            appState.selectedAddDates.forEach(dateStr => {
+                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: 'Entwicklung', loc: 'Büro A' };
+                html += `
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-4">
+                        <div class="w-32 font-bold text-sm text-slate-800">${formatDate(dateStr)}</div>
+                        <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <div class="flex-1 grid grid-cols-4 gap-2">
+                            <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="06:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="14:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <div class="flex items-center text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100" id="type-badge-${dateStr}">${existingTime.type}</div>
+                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort / Abt." oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <button onclick="removeAddedDateIfNoTime('${dateStr}')" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Tag entfernen">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+            });
+            content.innerHTML = html;
+            document.getElementById('times-sub-modal').classList.remove('hidden');
+            checkSaveAddedShiftsReady();
+        }
+
+        function closeTimesSubModal() {
+            document.getElementById('times-sub-modal').classList.add('hidden');
+        }
+
+        function handleTimeInput(e, dateStr, field) {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length >= 2 && !val.includes(':')) {
+                val = val.substring(0, 2) + ':' + val.substring(2, 4);
+            }
+            e.target.value = val;
+            updateAddedShiftData(dateStr);
+        }
+
+        function autoCalculateShiftType(startTime) {
+            if (!startTime || startTime.length < 5) return 'Frühdienst';
+            const hour = parseInt(startTime.split(':')[0], 10);
+            if (hour >= 5 && hour < 14) return 'Frühdienst';
+            if (hour >= 14 && hour < 22) return 'Spätdienst';
+            return 'Nachtdienst';
+        }
+
+        function updateAddedShiftData(dateStr) {
+            const start = document.getElementById(`time-start-${dateStr}`).value;
+            const end = document.getElementById(`time-end-${dateStr}`).value;
+            const loc = document.getElementById(`loc-${dateStr}`).value;
+            const calculatedType = autoCalculateShiftType(start);
+
+            const badge = document.getElementById(`type-badge-${dateStr}`);
+            if(badge) badge.textContent = calculatedType;
+
+            if (start && end) {
+                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept: 'Entwicklung', loc };
+            } else {
+                delete appState.addedShiftTimesData[dateStr];
+            }
+            checkSaveAddedShiftsReady();
+        }
+
+        function checkSaveAddedShiftsReady() {
+            const saveBtn = document.getElementById('save-added-shifts-btn');
+            const allHaveTimes = appState.selectedAddDates.length > 0 && appState.selectedAddDates.every(d => {
+                const data = appState.addedShiftTimesData[d];
+                return data && data.start && data.end;
+            });
+            saveBtn.disabled = !allHaveTimes;
+        }
+
+        function removeAddedDateIfNoTime(dateStr) {
+            const data = appState.addedShiftTimesData[dateStr];
+            if (data && (data.start || data.end)) {
+                showToast('Kann nicht gelöscht werden, da eine Uhrzeit zugewiesen ist.', 'error');
+                return;
+            }
+            appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
+            delete appState.addedShiftTimesData[dateStr];
+            openTimesSubModal();
+            switchSettingsTab('add');
+        }
+
+        function saveAddedShifts() {
+            appState.selectedAddDates.forEach(dateStr => {
+                const data = appState.addedShiftTimesData[dateStr];
+                if (data && data.start && data.end) {
+                    const [sh, sm] = data.start.split(':').map(Number);
+                    const [eh, em] = data.end.split(':').map(Number);
+                    let diffMins = (eh * 60 + em) - (sh * 60 + sm);
+                    if (diffMins < 0) diffMins += 24 * 60;
+                    const hours = Math.floor(diffMins / 60);
+                    const mins = diffMins % 60;
+                    const durationStr = `${hours}h ${mins}m`;
+
+                    appState.shifts.push({
+                        id: 's_' + Date.now() + Math.random(),
+                        date: dateStr,
+                        day: new Date(dateStr).toLocaleDateString('de-DE', { weekday: 'long' }),
+                        type: data.type,
+                        startTime: data.start,
+                        endTime: data.end,
+                        duration: durationStr,
+                        department: data.dept,
+                        location: data.loc,
+                        deleted: false
+                    });
+                }
+            });
+            appState.selectedAddDates = [];
+            appState.addedShiftTimesData = {};
+            closeTimesSubModal();
+            showToast('Schichten erfolgreich hinzugefügt.', 'info');
+            switchSettingsTab('add');
+        }
+
+        // --- TAB 2: SCHICHT LÖSCHEN (Req 15 & 16: Calendar where shift days are green with details) ---
+        function renderDeleteShiftTab(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+            
+            let html = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">Schichten löschen</h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Aktueller Monat: ${monthNames[month]} ${year}</p>
+                        </div>
+                        <button onclick="toggleDeleteMode()" class="px-5 py-2.5 ${appState.deleteModeActive ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} rounded-xl text-sm font-semibold transition-all shadow-sm">
+                            ${appState.deleteModeActive ? 'Auswahl beenden' : 'Lösch-Modus aktivieren'}
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
+                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
+            });
+
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div class="p-4 min-h-[100px] border-b border-r border-slate-200/50"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+                const isSelected = appState.selectedDeleteDate === dateStr;
+
+                html += `<div class="p-3 min-h-[100px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-50' : 'bg-white'} flex flex-col justify-between relative">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-700">${formatDate(`${year}-${month+1}-${day}`)}</span>
+                        ${appState.deleteModeActive && shift ? `<button onclick="promptDeleteShift('${shift.id}')" class="w-6 h-6 rounded-full ${isSelected ? 'bg-red-600' : 'bg-emerald-600'} hover:bg-red-500 text-white flex items-center justify-center transition-all shadow-sm">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </button>` : ''}
+                    </div>
+                    ${shift ? `<div class="text-[11px] bg-emerald-600 text-white p-1 rounded font-medium truncate">${shift.type}<br>${shift.startTime}-${shift.endTime}</div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
+                </div>`;
+            }
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleDeleteMode() {
+            appState.deleteModeActive = !appState.deleteModeActive;
+            switchSettingsTab('delete');
+        }
+
+        let pendingDeleteShiftId = null;
+        function promptDeleteShift(shiftId) {
+            pendingDeleteShiftId = shiftId;
+            const shift = appState.shifts.find(s => s.id === shiftId);
+            if (!shift) return;
+
+            const formattedDetail = formatDetailDate(shift.date);
+            const content = document.getElementById('delete-confirm-content');
+            content.innerHTML = `
+                <p class="text-sm text-slate-600 font-semibold">Möchten Sie diese Schicht wirklich löschen?</p>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                    <div><strong>Tag & Datum:</strong> ${formattedDetail}</div>
+                    <div><strong>Schichttyp:</strong> ${shift.type}</div>
+                    <div><strong>Zeit:</strong> ${shift.startTime} - ${shift.endTime} (${shift.duration})</div>
+                    <div><strong>Einsatzort:</strong> ${shift.location}, ${shift.department}</div>
+                </div>
+            `;
+            document.getElementById('delete-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteConfirmModal() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+        }
+
+        function executeDeleteShift() {
+            const shift = appState.shifts.find(s => s.id === pendingDeleteShiftId);
+            if (shift) {
+                shift.deleted = true;
+                appState.deletedShifts.push(shift);
+                showToast('Schicht erfolgreich gelöscht.', 'info');
+            }
+            closeDeleteConfirmModal();
+            appState.deleteModeActive = false;
+            switchSettingsTab('delete');
+        }
+
+        // --- TAB 3: SCHICHT BEARBEITEN (Req 17) ---
+        let currentEditingShiftId = null;
+        function renderEditShiftTab(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900">Schichten bearbeiten</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Klicken Sie auf ein Datum, um Details zu ändern oder zu verschieben (${monthNames[month]} ${year})</p>
+                    </div>
+
+                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
+                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
+            });
+
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div class="p-4 min-h-[90px] border-b border-r border-slate-200/50"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+
+                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 bg-white hover:bg-indigo-50/40 transition-colors cursor-pointer flex flex-col justify-between">
+                    <span class="text-xs font-bold text-slate-700">${formatDate(dateStr)}</span>
+                    ${shift ? `<div class="text-[10px] bg-indigo-50 text-indigo-700 p-1 rounded font-medium truncate">${shift.type}</div>` : '<span class="text-[10px] text-slate-300">Keine Schicht</span>'}
+                </div>`;
+            }
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function handleEditDateClick(dateStr) {
+            const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+            if (!shift) {
+                showToast(`An diesem Tag (${formatDate(dateStr)}) ist keine Schicht vorhanden.`, 'info');
+                return;
+            }
+            currentEditingShiftId = shift.id;
+            const content = document.getElementById('edit-shift-content');
+            content.innerHTML = `
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Datum</label>
+                    <input type="text" disabled value="${formatDate(shift.date)}" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Startzeit</label>
+                        <input type="text" id="edit-start" maxlength="5" value="${shift.startTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Endzeit</label>
+                        <input type="text" id="edit-end" maxlength="5" value="${shift.endTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ort</label>
+                        <input type="text" id="edit-loc" value="${shift.location}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Abteilung</label>
+                        <input type="text" id="edit-dept" value="${shift.department}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <button onclick="openMoveDateModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors border border-slate-200">Schicht auf anderen Tag verschieben</button>
+                </div>
+            `;
+            document.getElementById('edit-shift-modal').classList.remove('hidden');
+        }
+
+        function handleEditTimeAutoType(e) {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length >= 2 && !val.includes(':')) {
+                val = val.substring(0, 2) + ':' + val.substring(2, 4);
+            }
+            e.target.value = val;
+        }
+
+        function closeEditShiftModal() {
+            document.getElementById('edit-shift-modal').classList.add('hidden');
+        }
+
+        function saveEditedShift() {
+            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
+            if (!shift) return;
+
+            const start = document.getElementById('edit-start').value;
+            const end = document.getElementById('edit-end').value;
+            shift.startTime = start;
+            shift.endTime = end;
+            shift.type = autoCalculateShiftType(start);
+            shift.location = document.getElementById('edit-loc').value;
+            shift.department = document.getElementById('edit-dept').value;
+
+            closeEditShiftModal();
+            showToast('Schicht erfolgreich aktualisiert.', 'info');
+            switchSettingsTab('edit');
+        }
+
+        function openMoveDateModal() {
+            document.getElementById('move-date-modal').classList.remove('hidden');
+        }
+
+        function closeMoveDateModal() {
+            document.getElementById('move-date-modal').classList.add('hidden');
+        }
+
+        function confirmMoveShift() {
+            const targetDate = document.getElementById('move-target-date').value;
+            if (!targetDate) {
+                showToast('Bitte ein Zieldatum auswählen.', 'error');
+                return;
+            }
+            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
+            if (shift) {
+                shift.date = targetDate;
+                shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
+                showToast(`Schicht erfolgreich auf ${formatDate(targetDate)} verschoben.`, 'info');
+            }
+            closeMoveDateModal();
+            closeEditShiftModal();
+            switchSettingsTab('edit');
+        }
+
+        // --- TAB 4: ZUSÄTZLICHE FUNKTIONEN (Req 18, 19, 20) ---
+        function renderExtraFunctionsTab(container) {
+            // Requirement 18: Filter filters worked days, hours, and statistics comprehensively
+            let activeShifts = appState.shifts.filter(s => !s.deleted);
+            const now = new Date();
+
+            if (appState.filterMode === 'weekly') {
+                const monday = getMonday(now);
+                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= monday && d <= sunday;
+                });
+            } else if (appState.filterMode === 'monthly') {
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                });
+            } else if (appState.filterMode === 'yearly') {
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d.getFullYear() === now.getFullYear();
+                });
+            }
+
+            const totalDays = activeShifts.length;
+            const totalHours = totalDays * 8;
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen & Statistiken</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Umfassende Berichte und Exportoptionen</p>
+                    </div>
+
+                    <!-- Filter Control -->
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs font-semibold text-slate-600 uppercase">Filter:</span>
+                            <select onchange="appState.filterMode = this.value; switchSettingsTab('extra');" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
+                                <option value="all" ${appState.filterMode === 'all' ? 'selected' : ''}>Alle</option>
+                                <option value="weekly" ${appState.filterMode === 'weekly' ? 'selected' : ''}>Diese Woche</option>
+                                <option value="monthly" ${appState.filterMode === 'monthly' ? 'selected' : ''}>Diesen Monat</option>
+                                <option value="yearly" ${appState.filterMode === 'yearly' ? 'selected' : ''}>Dieses Jahr</option>
+                            </select>
+                        </div>
+                        <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span>PDF herunterladen</span>
+                        </button>
+                    </div>
+
+                    <!-- Statistics Cards filtered -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Schichttage</span>
+                            <div class="text-2xl font-bold text-slate-900 mt-1">${totalDays}</div>
+                        </div>
+                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
+                            <div class="text-2xl font-bold text-indigo-600 mt-1">~${totalHours} Std</div>
+                        </div>
+                    </div>
+
+                    <!-- Deleted Shifts List with Restoration Confirmation -->
+                    <div class="space-y-3">
+                        <h5 class="text-sm font-bold text-slate-800">Gelöschte Schichten (${appState.deletedShifts.length})</h5>
+                        <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                            ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                                    <span>${formatDate(s.date)} - ${s.type} (${s.startTime} - ${s.endTime})</span>
+                                    <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-indigo-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Requirement 19: Shift restoration requires explicit confirmation modal
+        function promptRestoreShift(index) {
+            appState.pendingRestoreIndex = index;
+            document.getElementById('restore-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeRestoreConfirmModal() {
+            document.getElementById('restore-confirm-modal').classList.add('hidden');
+            appState.pendingRestoreIndex = null;
+        }
+
+        function executeRestoreShift() {
+            if (appState.pendingRestoreIndex !== null) {
+                const shift = appState.deletedShifts.splice(appState.pendingRestoreIndex, 1)[0];
+                shift.deleted = false;
+                appState.shifts.push(shift);
+                showToast('Schicht erfolgreich wiederhergestellt.', 'info');
+            }
+            closeRestoreConfirmModal();
+            switchSettingsTab('extra');
+        }
+
+        // Requirement 20: Download exclusively as PDF file using jsPDF
+        function downloadPDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(18);
+            doc.text("ShogiDienste - Schichtbericht", 14, 20);
+            
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(11);
+            doc.text(`Generiert am: ${new Date().toLocaleDateString('de-DE')}`, 14, 28);
+            
+            let y = 40;
+            doc.setFont("Helvetica", "bold");
+            doc.text("Aktive Schichten:", 14, y);
+            y += 8;
+            
+            doc.setFont("Helvetica", "normal");
+            appState.shifts.filter(s => !s.deleted).forEach(s => {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.text(`- ${s.day}, ${formatDate(s.date)}: ${s.type} (${s.startTime} - ${s.endTime}), Ort: ${s.location}, Abt: ${s.department}`, 14, y);
+                y += 7;
+            });
+            
+            doc.save("ShogiDienste_Schichtbericht.pdf");
+            showToast('PDF-Bericht erfolgreich heruntergeladen.', 'info');
+        }
+    </script>
 </body>
 </html>
