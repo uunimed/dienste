@@ -86,6 +86,37 @@
             border-radius: inherit;
         }
 
+.current-time-column-bg {
+    background-color: rgba(249, 115, 22, 0.3);
+    pointer-events: none;
+    z-index: 15;
+}
+
+.current-time-line-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px; /* დაახლოებით ერთი საათის სექციის სიგანე, ან მორგებული */
+    background-color: rgba(249, 115, 22, 0.2);
+    pointer-events: none;
+    z-index: 15;
+    transform: translateX(-50%);
+    transition: left 0.5s linear;
+}
+
+.current-time-slider-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 15px; /* ზუსტად 1 სმ */
+    background-color: rgba(249, 115, 22, 0.6); /* 60% გამჭვირვალობის სტაფილოსფერი */
+    pointer-events: none;
+    z-index: 25;
+    transform: translateX(-50%);
+    border-left: 2px solid rgba(249, 115, 22, 0.9);
+    border-right: 2px solid rgba(249, 115, 22, 0.9);
+}
+
     </style>
 </head>
 <body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden flex flex-col">
@@ -564,7 +595,7 @@
             return new Date(d.setDate(diff));
         }
 
-        function renderWeeklyCalendar(container) {
+function renderWeeklyCalendar(container) {
             const monday = getMonday(appState.currentDate);
             let days = [];
             for (let i = 0; i < 7; i++) {
@@ -575,7 +606,20 @@
 
             const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
             
-            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col h-full">`;
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col h-full relative">`;
+            
+// მიმდინარე დროის ზუსტი გამოთვლა საათებისა და წუთების მიხედვით (+7 წუთიანი ოფსეტით)
+            const now = new Date();
+            const currentTotalMins = (now.getHours() * 60 + now.getMinutes() + 7) % (24 * 60);
+            
+            // ვანგარიშებთ პოზიციას: მარცხენა სვეტი (160px) + დროის შესაბამისი პროპორცია მთელ 24-საათიან ბადეზე
+            // (calc() იყენებს minmax(60px, 1fr) ბადის ზუსტ სიგანეს)
+            const hourProgress = currentTotalMins / (24 * 60);
+            
+            html += `<div class="absolute top-0 bottom-0 pointer-events-none z-25" style="left: calc(160px + (100% - 160px) * ${hourProgress});">
+                <div class="current-time-slider-bar"></div>
+            </div>`;
+
             html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-10" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
             html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center">Wochentag</div>`;
             for (let h = 0; h < 24; h++) {
@@ -589,7 +633,6 @@
                 const formattedDate = formatDate(d);
                 const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
 
-                // Check today using local time logic
                 const todayStr = toLocalISODate(new Date());
                 const isToday = dateStr === todayStr;
 
