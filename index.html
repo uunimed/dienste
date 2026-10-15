@@ -1,1600 +1,1603 @@
 <!DOCTYPE html>
 <html lang="de" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShogiDienste Schichtplaner</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Libraries for PDF and Charts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Particles.js -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    
-    <!-- Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        @keyframes floatBg {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-25px) rotate(3deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        .floating-shape-1 {
-            animation: floatBg 10s ease-in-out infinite;
-        }
-        .floating-shape-2 {
-            animation: floatBg 14s ease-in-out infinite reverse;
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .toast-slide {
-            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShogiDienste Schichtplaner</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Libraries for PDF and Charts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @keyframes floatBg {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-shape-1 {
+            animation: floatBg 10s ease-in-out infinite;
+        }
+        .floating-shape-2 {
+            animation: floatBg 14s ease-in-out infinite reverse;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-slide {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
-        /* ციმციმის ანიმაცია სტაფილოსფერი (Orange) აქცენტით */
-        @keyframes pulse-today-border {
-            0%, 100% { 
-                border-color: rgba(249, 115, 22, 0.4); 
-                background-color: rgba(249, 115, 22, 0.05); 
-                box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); 
-            }
-            50% { 
-                border-color: rgba(249, 115, 22, 1); 
-                background-color: rgba(249, 115, 22, 0.2); 
-                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); 
-            }
-        }
-        .today-highlight {
-            position: relative;
-        }
-        .today-highlight::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            border: 2px solid transparent;
-            animation: pulse-today-border 2s ease-in-out infinite;
-            z-index: 40;
-            border-radius: inherit;
-        }
+        /* ციმციმის ანიმაცია სტაფილოსფერი (Orange) აქცენტით */
+        @keyframes pulse-today-border {
+            0%, 100% { 
+                border-color: rgba(249, 115, 22, 0.4); 
+                background-color: rgba(249, 115, 22, 0.05); 
+                box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); 
+            }
+            50% { 
+                border-color: rgba(249, 115, 22, 1); 
+                background-color: rgba(249, 115, 22, 0.2); 
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); 
+            }
+        }
+        .today-highlight {
+            position: relative;
+        }
+        .today-highlight::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 2px solid transparent;
+            animation: pulse-today-border 2s ease-in-out infinite;
+            z-index: 40;
+            border-radius: inherit;
+        }
 
-.current-time-column-bg {
-    background-color: rgba(249, 115, 22, 0.3);
-    pointer-events: none;
-    z-index: 15;
-}
+        .current-time-column-bg {
+            background-color: rgba(249, 115, 22, 0.3);
+            pointer-events: none;
+            z-index: 15;
+        }
 
-.current-time-line-overlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 60px; /* დაახლოებით ერთი საათის სექციის სიგანე, ან მორგებული */
-    background-color: rgba(249, 115, 22, 0.2);
-    pointer-events: none;
-    z-index: 15;
-    transform: translateX(-50%);
-    transition: left 0.5s linear;
-}
+        .current-time-line-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 60px;
+            background-color: rgba(249, 115, 22, 0.2);
+            pointer-events: none;
+            z-index: 15;
+            transform: translateX(-50%);
+            transition: left 0.5s linear;
+        }
 
-.current-time-slider-bar {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 15px; /* ზუსტად 1 სმ */
-    background-color: rgba(249, 115, 22, 0.6); /* 60% გამჭვირვალობის სტაფილოსფერი */
-    pointer-events: none;
-    z-index: 25;
-    transform: translateX(-50%);
-    border-left: 2px solid rgba(249, 115, 22, 0.9);
-    border-right: 2px solid rgba(249, 115, 22, 0.9);
-}
+        .current-time-slider-bar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 38px; /* ზუსტად 1 სმ */
+            background-color: rgba(249, 115, 22, 0.6); /* 60% გამჭვირვალობის სტაფილოსფერი */
+            pointer-events: none;
+            z-index: 25;
+            transform: translateX(-50%);
+            border-left: 2px solid rgba(249, 115, 22, 0.9);
+            border-right: 2px solid rgba(249, 115, 22, 0.9);
+        }
 
-.sticky-day-column {
-    position: sticky;
-    left: 0;
-    z-index: 30;
-    background-color: #ffffff !important; /* მყარი თეთრი ფონი, რომ ქვეშ არაფერი გამოჩნდეს */
-}
-.sticky-day-column.today-col {
-    background-color: #ecfdf5 !important; /* დღევანდელი დღის მყარი ფონი (emerald-50) */
-}
+        .sticky-day-column {
+            position: sticky;
+            left: 0;
+            z-index: 30;
+            background-color: #ffffff !important; /* მყარი თეთრი ფონი */
+        }
+        .sticky-day-column.today-col {
+            background-color: #ffffff !important; /* მყარი თეთრი ფონი მიმდინარე დღისთვისაც */
+        }
 
-    </style>
+        #calendar-container {
+            height: fit-content !important;
+            max-height: none !important;
+        }
+    </style>
 </head>
 <body class="h-full bg-slate-50 text-slate-800 antialiased overflow-x-hidden flex flex-col">
 
-    <div id="app" class="min-h-full flex flex-col relative flex-1">
-
-        <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
-            <div id="particles-js" class="absolute inset-0 z-0"></div>
-            
-            <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
-            <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
-
-            <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
-                <div class="flex items-center space-x-3 mb-8">
-                    <div class="w-12 h-12 flex items-center justify-center text-indigo-600">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
-                    </div>
-                </div>
-
-                <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Benutzername</label>
-                        <input type="text" id="username-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
-                        <span id="username-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Passwort</label>
-                        <input type="password" id="password-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
-                        <span id="password-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
-                    </div>
-
-                    <button type="submit" id="login-submit-btn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center space-x-2">
-                        <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                        <span>Anmelden</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
-            <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
-                <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
-                    <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-800 transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-bold text-slate-900 tracking-tight">ShogiDienste</span>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <div class="bg-slate-200/70 p-1 rounded-xl flex space-x-1 border border-slate-300/50">
-                        <button onclick="setCalendarMode('weekly')" id="mode-weekly" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Woche</button>
-                        <button onclick="setCalendarMode('monthly')" id="mode-monthly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Monat</button>
-                        <button onclick="setCalendarMode('yearly')" id="mode-yearly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Jahr</button>
-                    </div>
-
-                    <button onclick="openSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-200 focus:outline-none shadow-xs" title="Einstellungen">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </header>
-
-            <main class="flex-1 px-[0.5cm] py-6 w-full flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <button onclick="goToCurrentDate()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold rounded-xl text-slate-700 transition-colors shadow-xs">Heute</button>
-                        <button onclick="changeDateRange(1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="calendar-container" class="flex-1 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-                    <!-- Rendered dynamically -->
-                </div>
-            </main>
-        </div>
-
-    </div>
-
-    <!-- Spinner -->
-    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-50/80 backdrop-blur-xl hidden flex-col items-center justify-center">
-        <div class="relative w-16 h-16 mb-4">
-            <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
-        </div>
-        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse"></span>
-    </div>
-
-    <!-- Modals (Shift Detail) -->
-    <div id="shift-detail-modal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[50px]">
-        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
-            <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
-                    </div>
-                </div>
-                <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="shift-detail-content" class="flex-1 p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
-                <!-- Populated dynamically -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 z-[50] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[1cm]">
-        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
-            <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900">Einstellungen</h3>
-                    </div>
-                </div>
-                <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <div class="flex-1 flex overflow-hidden">
-                <div class="w-72 bg-slate-50 border-r border-slate-200 p-4 flex flex-col space-y-2">
-                    <button onclick="switchSettingsTab('add')" id="tab-btn-add" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        <span>Schicht hinzufügen</span>
-                    </button>
-                    <button onclick="switchSettingsTab('delete')" id="tab-btn-delete" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        <span>Schicht löschen</span>
-                    </button>
-                    <button onclick="switchSettingsTab('edit')" id="tab-btn-edit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        <span>Schicht bearbeiten</span>
-                    </button>
-                    <button onclick="switchSettingsTab('extra')" id="tab-btn-extra" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span>Zusätzliche Funktionen</span>
-                    </button>
-                </div>
-
-                <div class="flex-1 p-8 overflow-y-auto bg-slate-50" id="settings-tab-content">
-                    <!-- Loaded dynamically -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirm Modals -->
-    <div id="delete-confirm-modal" class="fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h4 class="font-bold text-slate-900">bestätigen</h4>
-            </div>
-            <div id="delete-confirm-content" class="p-6 space-y-3">
-                <!-- Populated dynamically -->
-            </div>
-            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">löschen</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="restore-confirm-modal" class="fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h4 class="font-bold text-slate-900">Schicht wiederherstellen bestätigen</h4>
-            </div>
-            <div class="p-6 space-y-3">
-                <p class="text-sm text-slate-600">Möchten Sie diese gelöschte Schicht wirklich wiederherstellen?</p>
-            </div>
-            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="executeRestoreShift()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="edit-shift-modal" class="fixed inset-0 z-[80] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                <h4 class="font-bold text-slate-900">Schicht bearbeiten</h4>
-                <button onclick="closeEditShiftModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="edit-shift-content" class="p-6 space-y-4">
-                <!-- Populated dynamically -->
-            </div>
-            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                <button onclick="closeEditShiftModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="saveEditedShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Änderungen speichern</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="move-date-modal" class="fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h4 class="font-bold text-slate-900">Auf welchen Tag verschieben?</h4>
-            </div>
-            <div class="p-6 space-y-4">
-                <label class="block text-xs font-semibold text-slate-600 uppercase">Neues Datum auswählen</label>
-                <input type="date" id="move-target-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
-            </div>
-            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
-                <button onclick="closeMoveDateModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
-                <button onclick="confirmMoveShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Verschieben</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col space-y-3 pointer-events-none"></div>
-
-    <script>
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAEbSWfiZ6xGL7_NoVVFpy-JkGwebb78RQ",
-            authDomain: "using-6af8b.firebaseapp.com",
-            databaseURL: "https://using-6af8b-default-rtdb.firebaseio.com",
-            projectId: "using-6af8b",
-            storageBucket: "using-6af8b.firebasestorage.app",
-            messagingSenderId: "316715965452",
-            appId: "1:316715965452:web:8a07ffdf5905a571cc2229",
-            measurementId: "G-XNXV9CRKEG"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const shiftsRef = db.ref('shogidienste/shifts');
-
-        let appState = {
-            isLoggedIn: false,
-            calendarMode: 'weekly',
-            currentDate: new Date(),
-            shifts: [],
-            deletedShifts: [],
-            addShiftRangeStart: '',
-            addShiftRangeEnd: '',
-            selectedAddDates: [],
-            addedShiftTimesData: {},
-            addShiftStep: 'dates', 
-            deleteModeActive: false,
-            selectedDeleteDate: null,
-            filterMode: 'monthly',
-            pendingRestoreIndex: null,
-            currentTab: 'add'
-        };
-
-        // Realtime Data Sync from Firebase
-        shiftsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            appState.shifts = data ? Object.values(data) : [];
-            appState.deletedShifts = appState.shifts.filter(s => s.deleted);
-            
-            if (appState.isLoggedIn) {
-                renderCalendar();
-                const settingsModal = document.getElementById('settings-modal');
-                if (settingsModal && !settingsModal.classList.contains('hidden')) {
-                    switchSettingsTab(appState.currentTab);
-                }
-            }
-        });
-
-        function saveToFirebase() {
-            shiftsRef.set(appState.shifts);
-        }
-
-        // Chart.js instance
-        let shiftChartInstance = null;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            particlesJS('particles-js', {
-                particles: {
-                    number: { value: 60, density: { enable: true, value_area: 800 } },
-                    color: { value: "#4f46e5" }, 
-                    shape: { type: "circle" },
-                    opacity: { value: 0.3, random: false },
-                    size: { value: 3, random: true },
-                    line_linked: { enable: true, distance: 150, color: "#4f46e5", opacity: 0.2, width: 1 },
-                    move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
-                },
-                interactivity: {
-                    detect_on: "canvas",
-                    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
-                    modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
-                },
-                retina_detect: true
-            });
-        });
-
-        // ლოკალური დროით თარიღის სტრინგის გენერირების ფუნქცია (თავიდან ირიდებს Timezone შეცდომებს)
-        function toLocalISODate(dateObj) {
-            const d = new Date(dateObj);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function formatDate(dateObj) {
-            const d = new Date(dateObj);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}.${month}.${year}`;
-        }
-
-        function formatDetailDate(dateStr) {
-            const d = new Date(dateStr);
-            const weekday = d.toLocaleDateString('de-DE', { weekday: 'long' });
-            return `${formatDate(d)}, ${weekday}`;
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const usernameInput = document.getElementById('username-input');
-            const passwordInput = document.getElementById('password-input');
-            const userErr = document.getElementById('username-error');
-            const passErr = document.getElementById('password-error');
-
-            userErr.classList.add('hidden');
-            passErr.classList.add('hidden');
-
-            let hasError = false;
-            if (!usernameInput.value.trim()) {
-                userErr.textContent = 'Benutzername darf nicht leer sein.';
-                userErr.classList.remove('hidden');
-                hasError = true;
-            } else if (usernameInput.value.trim() !== 'alex') {
-                userErr.textContent = 'Ungültiger Benutzername.';
-                userErr.classList.remove('hidden');
-                hasError = true;
-            }
-
-            if (!passwordInput.value.trim()) {
-                passErr.textContent = 'Passwort darf nicht leer sein.';
-                passErr.classList.remove('hidden');
-                hasError = true;
-            } else if (passwordInput.value.trim() !== '2911') {
-                passErr.textContent = 'Ungültiges Passwort.';
-                passErr.classList.remove('hidden');
-                hasError = true;
-            }
-
-            if (hasError) return;
-
-            const spinner = document.getElementById('global-spinner');
-            spinner.classList.remove('hidden');
-            spinner.style.display = 'flex';
-
-            setTimeout(() => {
-                spinner.classList.add('hidden');
-                spinner.style.display = 'none';
-                appState.isLoggedIn = true;
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('main-app-view').classList.remove('hidden');
-                showToast('Erfolgreich angemeldet.', 'info');
-                renderCalendar();
-            }, 800);
-        }
-
-        function refreshMainView() {
-            const spinner = document.getElementById('global-spinner');
-            spinner.classList.remove('hidden');
-            spinner.style.display = 'flex';
-            setTimeout(() => {
-                spinner.classList.add('hidden');
-                spinner.style.display = 'none';
-                appState.currentDate = new Date();
-                renderCalendar();
-                showToast('Ansicht aktualisiert.', 'info');
-            }, 500);
-        }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto flex items-center space-x-3 px-5 py-4 rounded-xl shadow-xl border text-white font-medium text-sm toast-slide ${
-                type === 'error' ? 'bg-red-600 border-red-500' : 'bg-slate-900 border-slate-700'
-            }`;
-
-            const svgIcon = type === 'error' 
-                ? '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
-                : '<svg class="w-5 h-5 flex-shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-
-            toast.innerHTML = `${svgIcon}<span>${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        function setCalendarMode(mode) {
-            appState.calendarMode = mode;
-            ['weekly', 'monthly', 'yearly'].forEach(m => {
-                const btn = document.getElementById(`mode-${m}`);
-                if (m === mode) {
-                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all';
-                } else {
-                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
-                }
-            });
-            renderCalendar();
-        }
-
-        function changeDateRange(direction) {
-            const d = new Date(appState.currentDate);
-            if (appState.calendarMode === 'weekly') {
-                d.setDate(d.getDate() + (direction * 7));
-            } else if (appState.calendarMode === 'monthly') {
-                d.setMonth(d.getMonth() + direction);
-            } else {
-                d.setFullYear(d.getFullYear() + direction);
-            }
-            appState.currentDate = d;
-            renderCalendar();
-        }
-
-        function goToCurrentDate() {
-            appState.currentDate = new Date();
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            const container = document.getElementById('calendar-container');
-            const titleEl = document.getElementById('calendar-title');
-
-            container.innerHTML = '';
-
-            if (appState.calendarMode === 'weekly') {
-                titleEl.textContent = 'Wochenübersicht';
-                renderWeeklyCalendar(container);
-            } else if (appState.calendarMode === 'monthly') {
-                titleEl.textContent = 'Monatsübersicht';
-                renderMonthlyCalendar(container);
-            } else {
-                titleEl.textContent = 'Jahresübersicht';
-                renderYearlyCalendar(container);
-            }
-        }
-
-        function getMonday(d) {
-            d = new Date(d);
-            var day = d.getDay(),
-                diff = d.getDate() - day + (day == 0 ? -6: 1);
-            return new Date(d.setDate(diff));
-        }
-
-function renderWeeklyCalendar(container) {
-            const monday = getMonday(appState.currentDate);
-            let days = [];
-            for (let i = 0; i < 7; i++) {
-                let tempD = new Date(monday);
-                tempD.setDate(monday.getDate() + i);
-                days.push(tempD);
-            }
-
-            const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
-            
-            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col h-full relative">`;
-            
-            // მიმდინარე დროის ზუსტი გამოთვლა საათებისა და წუთების მიხედვით (+7 წუთიანი ოფსეტით)
-            const now = new Date();
-            const currentTotalMins = (now.getHours() * 60 + now.getMinutes() + 7) % (24 * 60);
-            const hourProgress = currentTotalMins / (24 * 60);
-            
-            html += `<div class="absolute top-0 bottom-0 pointer-events-none z-25" style="left: calc(160px + (100% - 160px) * ${hourProgress});">
-                <div class="current-time-slider-bar"></div>
-            </div>`;
-
-            // საათების სათაურის მწკრივი (მარცხენა კუთხე ფიქსირებულია sticky-day-column-ით)
-            html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-20" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
-            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center sticky-day-column bg-slate-50">Wochentag</div>`;
-            for (let h = 0; h < 24; h++) {
-                const timeStr = String(h).padStart(2, '0') + ':00';
-                html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500">${timeStr}</div>`;
-            }
-            html += `</div>`;
-
-            days.forEach((d, idx) => {
-                const dateStr = toLocalISODate(d);
-                const formattedDate = formatDate(d);
-                const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
-
-                const todayStr = toLocalISODate(new Date());
-                const isToday = dateStr === todayStr;
-
-                html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative ${isToday ? 'today-highlight bg-emerald-50/30' : ''}" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
-                
-// Day Label (მყარი ფონით, რომ შიფტები არ გამოჩნდეს ქვეშ)
-                html += `<div class="p-3 border-r border-slate-200 flex flex-col justify-center h-full sticky-day-column ${isToday ? 'today-col' : ''}" style="grid-row: 1; grid-column: 1;">
-                    <span class="text-xs font-bold text-emerald-600">${dayNames[idx]}</span>
-                    <span class="text-[11px] text-slate-500">${formattedDate}</span>
-                </div>`;
-
-                // 24 Empty Background Cells
-                for (let i = 0; i < 24; i++) {
-                    html += `<div class="border-r border-slate-100 h-full w-full" style="grid-row: 1; grid-column: ${i + 2};"></div>`;
-                }
-
-                // Overlay Container for Absolute Shifts
-                html += `<div style="grid-row: 1; grid-column: 2 / span 24;" class="relative w-full h-full pointer-events-none">`;
-                
-                dayShifts.forEach(shift => {
-                    const [sh, sm] = shift.startTime.split(':').map(Number);
-                    const [eh, em] = shift.endTime.split(':').map(Number);
-                    
-                    let startMins = sh * 60 + sm;
-                    let endMins = eh * 60 + em;
-                    if (endMins <= startMins) endMins += 24 * 60; // Overnight
-                    
-                    let visualEndMins = endMins > 24 * 60 ? 24 * 60 : endMins;
-                    let durationMins = visualEndMins - startMins;
-
-                    const leftPerc = (startMins / (24 * 60)) * 100;
-                    const widthPerc = (durationMins / (24 * 60)) * 100;
-
-                    html += `<div onclick="openShiftDetail('${shift.id}')" style="left: ${leftPerc}%; width: ${widthPerc}%;" class="absolute top-2.5 h-[55px] bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden pointer-events-auto">
-                        <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
-                            <span class="truncate">${shift.startTime}-${shift.endTime}</span>
-                            <span class="bg-emerald-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shift.type}</span>
-                        </div>
-                        <div class="text-[10px] font-medium truncate">${shift.department}</div>
-                    </div>`;
-                });
-                
-                html += `</div>`; // End overlay
-                html += `</div>`; // End day row
-            });
-            html += `</div></div>`;
-
-            container.innerHTML = html;
-        }
-
-        function renderMonthlyCalendar(container) {
-            const year = appState.currentDate.getFullYear();
-            const month = appState.currentDate.getMonth();
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-
-            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            
-            let html = `<div class="p-4 bg-slate-50 border-b border-slate-200 text-center font-bold text-slate-800">${monthNames[month]} ${year}</div>`;
-            html += `<div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 text-center py-2">
-                <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
-            </div>`;
-
-            html += `<div class="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-slate-100">`;
-            
-            let startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-            for (let i = 0; i < startDayOfWeek; i++) {
-                html += `<div class="bg-slate-50/30 p-2 min-h-[110px]"></div>`;
-            }
-
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
-                const hasShift = dayShifts.length > 0;
-
-                const todayStr = toLocalISODate(new Date());
-                const isToday = dateStr === todayStr;
-
-                if (hasShift) {
-                    html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer relative ${isToday ? 'today-highlight' : ''}" onclick="openShiftDetail('${dayShifts[0].id}')">
-                        <div class="text-xs font-bold text-white mb-2 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
-                        <div class="space-y-2 overflow-y-auto max-h-[90px] relative z-20">`;
-                    dayShifts.forEach(shift => {
-                        html += `<div class="text-[11px] text-white flex flex-col leading-tight border-t border-emerald-400/50 pt-1 first:border-0 first:pt-0">
-                            <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
-                            <span class="text-[10px] text-emerald-100">${shift.type} (${shift.location})</span>
-                        </div>`;
-                    });
-                    html += `</div></div>`;
-                } else {
-                    html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col relative ${isToday ? 'today-highlight' : ''}">
-                        <div class="text-xs font-bold text-slate-700 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
-                        <div class="text-[10px] text-slate-300 italic pt-2 relative z-20">Keine Schicht</div>
-                    </div>`;
-                }
-            }
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderYearlyCalendar(container) {
-            const year = appState.currentDate.getFullYear();
-            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
-            let html = `<div class="p-6 overflow-y-auto flex-1 space-y-8">`;
-            html += `<div class="text-center font-bold text-xl text-slate-800">Jahreskalender ${year}</div>`;
-            html += `<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">`;
-
-            monthNames.forEach((mName, mIdx) => {
-                const firstD = new Date(year, mIdx, 1);
-                const lastD = new Date(year, mIdx + 1, 0);
-                
-                html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col">
-                    <div class="font-bold text-emerald-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
-                    <div class="grid grid-cols-7 text-[10px] text-slate-400 font-semibold text-center mb-1">
-                        <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-1 text-[11px] text-center">`;
-
-                let startDow = firstD.getDay() === 0 ? 6 : firstD.getDay() - 1;
-                for (let i = 0; i < startDow; i++) {
-                    html += `<div></div>`;
-                }
-                for (let d = 1; d <= lastD.getDate(); d++) {
-                    const dStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                    const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
-                    
-                    const todayStr = toLocalISODate(new Date());
-                    const isToday = dStr === todayStr;
-
-                    if (shift) {
-                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs relative ${isToday ? 'today-highlight' : ''}" title="${shift.type} (${shift.startTime}-${shift.endTime})"><span class="relative z-20">${d}</span></div>`;
-                    } else {
-                        html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100 relative ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${d}</span></div>`;
-                    }
-                }
-                html += `</div></div>`;
-            });
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function openShiftDetail(shiftId) {
-            const shift = appState.shifts.find(s => s.id === shiftId);
-            if (!shift) return;
-
-            const formattedDetail = formatDetailDate(shift.date);
-            const content = document.getElementById('shift-detail-content');
-            content.innerHTML = `
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Datum</span>
-                    <span class="text-lg font-bold text-slate-900 mt-1">${formattedDetail}</span>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Schichttyp</span>
-                    <span class="text-lg font-bold text-emerald-600 mt-1">${shift.type}</span>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Start- und Endzeit</span>
-                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.startTime} - ${shift.endTime}</span>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Arbeitsdauer</span>
-                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.duration}</span>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abteilung</span>
-                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.department}</span>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Einsatzort</span>
-                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.location}</span>
-                </div>
-            `;
-            document.getElementById('shift-detail-modal').classList.remove('hidden');
-        }
-
-        function closeShiftDetailModal() {
-            document.getElementById('shift-detail-modal').classList.add('hidden');
-        }
-
-        function openSettingsModal() {
-            document.getElementById('settings-modal').classList.remove('hidden');
-            appState.addShiftStep = 'dates';
-            switchSettingsTab(appState.currentTab);
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settings-modal').classList.add('hidden');
-            renderCalendar();
-        }
-
-        function switchSettingsTab(tabName) {
-            appState.currentTab = tabName;
-            ['add', 'delete', 'edit', 'extra'].forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                if (t === tabName) {
-                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left';
-                } else {
-                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left';
-                }
-            });
-
-            const contentArea = document.getElementById('settings-tab-content');
-            if (tabName === 'add') renderAddShiftTab(contentArea);
-            else if (tabName === 'delete') renderDeleteShiftTab(contentArea);
-            else if (tabName === 'edit') renderEditShiftTab(contentArea);
-            else if (tabName === 'extra') renderExtraFunctionsTab(contentArea);
-        }
-
-        function renderAddShiftTab(container) {
-            if (appState.addShiftStep === 'times') {
-                renderAddShiftTimesStep(container);
-                return;
-            }
-
-            const year = appState.currentDate.getFullYear();
-            const month = appState.currentDate.getMonth();
-            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
-            let html = `
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-900">Schichten hinzufügen</h4>
-                        </div>
-                        <button onclick="goToAddTimesStep()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Zeiten festlegen</button>
-                    </div>
-
-                    <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von Datum</label>
-                            <input type="date" id="add-start-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeStart}">
-                        </div>
-                        <div class="flex-1">
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis Datum</label>
-                            <input type="date" id="add-end-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeEnd}">
-                        </div>
-                        <div class="pt-5">
-                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Bereich markieren</button>
-                        </div>
-                    </div>
-
-                    <div class="border border-slate-200 rounded-2xl overflow-hidden p-6 bg-slate-50/50">
-                        <div class="text-sm font-bold text-slate-800 mb-4">${monthNames[month]} ${year} (Ausgewählte Tage: ${appState.selectedAddDates.length})</div>
-                        <div class="grid grid-cols-7 text-xs font-semibold text-slate-400 text-center mb-2">
-                            <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2">
-            `;
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-            for (let i = 0; i < startDow; i++) {
-                html += `<div></div>`;
-            }
-
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isSelected = appState.selectedAddDates.includes(dStr);
-                const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
-                
-                let bgClass = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
-                if (isSelected) {
-                    bgClass = 'bg-emerald-700 text-white border-emerald-800 shadow-md';
-                } else if (hasShift) {
-                    bgClass = 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
-                }
-                
-                const todayStr = toLocalISODate(new Date());
-                const isToday = dStr === todayStr;
-
-                html += `<div onclick="toggleDateSelection('${dStr}')" class="p-3 rounded-xl border text-center text-xs font-bold cursor-pointer transition-all relative ${bgClass} ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${day}</span></div>`;
-            }
-
-            html += `</div></div></div>`;
-            container.innerHTML = html;
-        }
-
-        function toggleDateSelection(dateStr) {
-            if (appState.selectedAddDates.includes(dateStr)) {
-                appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
-            } else {
-                appState.selectedAddDates.push(dateStr);
-            }
-            switchSettingsTab('add');
-        }
-
-        function confirmDateRangeSelection() {
-            const start = document.getElementById('add-start-date').value;
-            const end = document.getElementById('add-end-date').value;
-            if (!start || !end) {
-                showToast('Bitte Start- und Enddatum auswählen.', 'error');
-                return;
-            }
-            appState.addShiftRangeStart = start;
-            appState.addShiftRangeEnd = end;
-
-            let startDate = new Date(start);
-            let endDate = new Date(end);
-            if (startDate > endDate) {
-                showToast('Das Startdatum darf nicht nach dem Enddatum liegen.', 'error');
-                return;
-            }
-
-            let dates = [];
-            let curr = new Date(startDate);
-            while (curr <= endDate) {
-                dates.push(toLocalISODate(curr));
-                curr.setDate(curr.getDate() + 1);
-            }
-            appState.selectedAddDates = dates;
-            showToast(`${dates.length} Tage markiert.`, 'info');
-            switchSettingsTab('add');
-        }
-
-        function goToAddTimesStep() {
-            if (appState.selectedAddDates.length === 0) return;
-            appState.addShiftStep = 'times';
-            switchSettingsTab('add');
-        }
-
-        function renderAddShiftTimesStep(container) {
-            let html = `
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-900">Zeiten für ausgewählte Tage festlegen</h4>
-                        </div>
-                        <button onclick="appState.addShiftStep = 'dates'; switchSettingsTab('add');" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Zurück zur Kalenderauswahl</button>
-                    </div>
-
-                    <div class="space-y-3 max-h-[450px] overflow-y-auto pr-2">
-            `;
-
-            appState.selectedAddDates.forEach(dateStr => {
-                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: '', loc: '' };
-                html += `
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-4">
-                        <div class="w-40 font-bold text-xs text-slate-800 leading-tight">${formatDetailDate(dateStr)}</div>
-                        <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        
-                        <div class="flex-1 grid grid-cols-5 gap-2">
-                            <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="07:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="15:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <div class="flex items-center justify-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-xl border border-emerald-100 text-center" id="type-badge-${dateStr}">${existingTime.type}</div>
-                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <input type="text" id="dept-${dateStr}" value="${existingTime.dept}" placeholder="Abteilung" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                        </div>
-                        
-                        <button onclick="removeAddedDateIfNoTime('${dateStr}')" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Tag entfernen">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
-                `;
-            });
-
-            html += `</div>
-                <div class="flex justify-end pt-4 border-t border-slate-200">
-                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Alle Schichten speichern</button>
-                </div>
-            </div>`;
-            container.innerHTML = html;
-            checkSaveAddedShiftsReady();
-        }
-
-        function handleTimeInput(e, dateStr, field) {
-            let val = e.target.value.replace(/[^0-9]/g, '');
-            if (val.length >= 2 && !val.includes(':')) {
-                val = val.substring(0, 2) + ':' + val.substring(2, 4);
-            }
-            e.target.value = val;
-            
-            if (field === 'start' && val.length === 5) {
-                const endInput = document.getElementById(`time-end-${dateStr}`);
-                if (endInput) endInput.focus();
-            }
-
-            updateAddedShiftData(dateStr);
-        }
-
-        function autoCalculateShiftType(startTime) {
-            if (!startTime || startTime.length < 5) return 'Frühdienst';
-            const hour = parseInt(startTime.split(':')[0], 10);
-            if (hour >= 5 && hour < 14) return 'Frühdienst';
-            if (hour >= 14 && hour < 22) return 'Spätdienst';
-            return 'Nachtdienst';
-        }
-
-        function updateAddedShiftData(dateStr) {
-            const startInput = document.getElementById(`time-start-${dateStr}`);
-            const endInput = document.getElementById(`time-end-${dateStr}`);
-            const locInput = document.getElementById(`loc-${dateStr}`);
-            const deptInput = document.getElementById(`dept-${dateStr}`);
-            
-            const start = startInput ? startInput.value : '';
-            const end = endInput ? endInput.value : '';
-            const loc = locInput ? locInput.value : '';
-            const dept = deptInput ? deptInput.value : '';
-            
-            const calculatedType = autoCalculateShiftType(start);
-
-            const badge = document.getElementById(`type-badge-${dateStr}`);
-            if(badge) badge.textContent = calculatedType;
-
-            if (start && end) {
-                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept, loc };
-            } else {
-                delete appState.addedShiftTimesData[dateStr];
-            }
-            checkSaveAddedShiftsReady();
-        }
-
-        function checkSaveAddedShiftsReady() {
-            const saveBtn = document.getElementById('save-added-shifts-btn');
-            if(!saveBtn) return;
-            const allHaveTimes = appState.selectedAddDates.length > 0 && appState.selectedAddDates.every(d => {
-                const data = appState.addedShiftTimesData[d];
-                return data && data.start && data.end;
-            });
-            saveBtn.disabled = !allHaveTimes;
-        }
-
-        function removeAddedDateIfNoTime(dateStr) {
-            const data = appState.addedShiftTimesData[dateStr];
-            if (data && (data.start || data.end)) {
-                showToast('Kann nicht entfernt werden.', 'error');
-                return;
-            }
-            appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
-            delete appState.addedShiftTimesData[dateStr];
-            switchSettingsTab('add');
-        }
-
-        function saveAddedShifts() {
-            appState.selectedAddDates.forEach(dateStr => {
-                const data = appState.addedShiftTimesData[dateStr];
-                if (data && data.start && data.end) {
-                    const [sh, sm] = data.start.split(':').map(Number);
-                    const [eh, em] = data.end.split(':').map(Number);
-                    let diffMins = (eh * 60 + em) - (sh * 60 + sm);
-                    if (diffMins < 0) diffMins += 24 * 60;
-                    const hours = Math.floor(diffMins / 60);
-                    const mins = diffMins % 60;
-                    const durationStr = `${hours}h ${mins}m`;
-
-                    appState.shifts.push({
-                        id: 's_' + Date.now() + Math.random(),
-                        date: dateStr,
-                        day: new Date(dateStr).toLocaleDateString('de-DE', { weekday: 'long' }),
-                        type: data.type,
-                        startTime: data.start,
-                        endTime: data.end,
-                        duration: durationStr,
-                        department: data.dept || 'Intensivmedizin',
-                        location: data.loc || 'Station A',
-                        deleted: false
-                    });
-                }
-            });
-            appState.selectedAddDates = [];
-            appState.addedShiftTimesData = {};
-            appState.addShiftStep = 'dates';
-            showToast('Schichten hinzugefügt.', 'info');
-            saveToFirebase(); // Firebase Sync
-            switchSettingsTab('add');
-        }
-
-        function renderDeleteShiftTab(container) {
-            const year = appState.currentDate.getFullYear();
-            const month = appState.currentDate.getMonth();
-            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            
-            let html = `
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-900">Schichten löschen</h4>
-                            <p class="text-xs text-slate-500 mt-0.5">Monat: ${monthNames[month]} ${year}</p>
-                        </div>
-                        <button onclick="toggleDeleteMode()" class="px-5 py-2.5 ${appState.deleteModeActive ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} rounded-xl text-sm font-semibold transition-all shadow-sm">
-                            ${appState.deleteModeActive ? 'beenden' : 'aktivieren'}
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
-            `;
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
-                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
-            });
-
-            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-            for (let i = 0; i < startDow; i++) {
-                html += `<div class="p-4 min-h-[100px] border-b border-r border-slate-200/50"></div>`;
-            }
-
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
-
-                const todayStr = toLocalISODate(new Date());
-                const isToday = dateStr === todayStr;
-
-                html += `<div class="p-3 min-h-[100px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500' : 'bg-white'} ${isToday ? 'today-highlight' : ''} flex flex-col justify-between relative transition-colors">
-                        <div class="flex justify-between items-center relative z-20">
-                            <span class="text-xs font-bold ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(`${year}-${month+1}-${day}`)}</span>
-                            ${appState.deleteModeActive && shift ? `<button onclick="promptDeleteShift('${shift.id}')" class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-700 text-white flex items-center justify-center transition-all shadow-sm">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            </button>` : ''}
-                        </div>
-                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span>${shift.startTime}-${shift.endTime}</div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
-                </div>`;
-            }
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function toggleDeleteMode() {
-            appState.deleteModeActive = !appState.deleteModeActive;
-            switchSettingsTab('delete');
-        }
-
-        let pendingDeleteShiftId = null;
-        function promptDeleteShift(shiftId) {
-            pendingDeleteShiftId = shiftId;
-            const shift = appState.shifts.find(s => s.id === shiftId);
-            if (!shift) return;
-
-            const formattedDetail = formatDetailDate(shift.date);
-            const content = document.getElementById('delete-confirm-content');
-            content.innerHTML = `
-                <p class="text-sm text-slate-600 font-semibold">Möchten Sie diese Schicht wirklich löschen?</p>
-                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
-                    <div><strong>Tag & Datum:</strong> ${formattedDetail}</div>
-                    <div><strong>Schichttyp:</strong> ${shift.type}</div>
-                    <div><strong>Zeit:</strong> ${shift.startTime} - ${shift.endTime} (${shift.duration})</div>
-                    <div><strong>Einsatzort:</strong> ${shift.location}, ${shift.department}</div>
-                </div>
-            `;
-            document.getElementById('delete-confirm-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteConfirmModal() {
-            document.getElementById('delete-confirm-modal').classList.add('hidden');
-        }
-
-        function executeDeleteShift() {
-            const shift = appState.shifts.find(s => s.id === pendingDeleteShiftId);
-            if (shift) {
-                shift.deleted = true;
-                appState.deletedShifts.push(shift);
-                showToast('Schicht gelöscht.', 'info');
-                saveToFirebase(); // Firebase Sync
-            }
-            closeDeleteConfirmModal();
-            appState.deleteModeActive = false;
-            switchSettingsTab('delete');
-        }
-
-        let currentEditingShiftId = null;
-        function renderEditShiftTab(container) {
-            const year = appState.currentDate.getFullYear();
-            const month = appState.currentDate.getMonth();
-            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
-            let html = `
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="text-lg font-bold text-slate-900">Schichten bearbeiten</h4>
-                        <p class="text-xs text-slate-500 mt-0.5">Klicken Sie auf ein Datum, um Details zu ändern oder zu verschieben (${monthNames[month]} ${year})</p>
-                    </div>
-
-                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
-            `;
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
-                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
-            });
-
-            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-            for (let i = 0; i < startDow; i++) {
-                html += `<div class="p-4 min-h-[90px] border-b border-r border-slate-200/50"></div>`;
-            }
-
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
-
-                const todayStr = toLocalISODate(new Date());
-                const isToday = dateStr === todayStr;
-
-                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500 hover:bg-emerald-600 shadow-inner' : 'bg-white hover:bg-slate-50'} ${isToday ? 'today-highlight' : ''} transition-colors cursor-pointer flex flex-col justify-between relative">
-                        <span class="text-xs font-bold relative z-20 ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(dateStr)}</span>
-                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span></div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
-                </div>`;
-            }
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function handleEditDateClick(dateStr) {
-            const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
-            if (!shift) {
-                showToast(`An diesem Tag (${formatDate(dateStr)}) ist keine Schicht vorhanden.`, 'info');
-                return;
-            }
-            currentEditingShiftId = shift.id;
-            const content = document.getElementById('edit-shift-content');
-            content.innerHTML = `
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Datum</label>
-                    <input type="text" disabled value="${formatDetailDate(shift.date)}" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Startzeit</label>
-                        <input type="text" id="edit-start" maxlength="5" value="${shift.startTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Endzeit</label>
-                        <input type="text" id="edit-end" maxlength="5" value="${shift.endTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ort</label>
-                        <input type="text" id="edit-loc" value="${shift.location}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Abteilung</label>
-                        <input type="text" id="edit-dept" value="${shift.department}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
-                    </div>
-                </div>
-                <div>
-                    <button onclick="openMoveDateModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors border border-slate-200">Schicht auf anderen Tag verschieben</button>
-                </div>
-            `;
-            document.getElementById('edit-shift-modal').classList.remove('hidden');
-        }
-
-        function handleEditTimeAutoType(e) {
-            let val = e.target.value.replace(/[^0-9]/g, '');
-            if (val.length >= 2 && !val.includes(':')) {
-                val = val.substring(0, 2) + ':' + val.substring(2, 4);
-            }
-            e.target.value = val;
-        }
-
-        function closeEditShiftModal() {
-            document.getElementById('edit-shift-modal').classList.add('hidden');
-        }
-
-        function saveEditedShift() {
-            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
-            if (!shift) return;
-
-            const start = document.getElementById('edit-start').value;
-            const end = document.getElementById('edit-end').value;
-            shift.startTime = start;
-            shift.endTime = end;
-            shift.type = autoCalculateShiftType(start);
-            shift.location = document.getElementById('edit-loc').value;
-            shift.department = document.getElementById('edit-dept').value;
-
-            closeEditShiftModal();
-            showToast('Schicht aktualisiert.', 'info');
-            saveToFirebase(); // Firebase Sync
-            switchSettingsTab('edit');
-        }
-
-        function openMoveDateModal() {
-            document.getElementById('move-date-modal').classList.remove('hidden');
-        }
-
-        function closeMoveDateModal() {
-            document.getElementById('move-date-modal').classList.add('hidden');
-        }
-
-        function confirmMoveShift() {
-            const targetDate = document.getElementById('move-target-date').value;
-            if (!targetDate) {
-                showToast('Bitte ein Zieldatum auswählen.', 'error');
-                return;
-            }
-            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
-            if (shift) {
-                shift.date = targetDate;
-                shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
-                showToast(`Schicht auf ${formatDate(targetDate)} verschoben.`, 'info');
-                saveToFirebase(); // Firebase Sync
-            }
-            closeMoveDateModal();
-            closeEditShiftModal();
-            switchSettingsTab('edit');
-        }
-
-        function initChart(labels, dataPoints) {
-            const canvas = document.getElementById('shiftChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            if (shiftChartInstance) {
-                shiftChartInstance.destroy();
-            }
-
-            shiftChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Arbeitsstunden',
-                        data: dataPoints,
-                        backgroundColor: '#059669', // emerald-600
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Stunden' }
-                        },
-                        x: {
-                            title: { display: true, text: 'Datum' }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        function renderExtraFunctionsTab(container) {
-            let activeShifts = appState.shifts.filter(s => !s.deleted);
-            const now = new Date();
-
-            if (appState.filterMode === 'weekly') {
-                const monday = getMonday(now);
-                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
-                activeShifts = activeShifts.filter(s => {
-                    const d = new Date(s.date);
-                    return d >= monday && d <= sunday;
-                });
-            } else if (appState.filterMode === 'monthly') {
-                activeShifts = activeShifts.filter(s => {
-                    const d = new Date(s.date);
-                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                });
-            } else if (appState.filterMode === 'yearly') {
-                activeShifts = activeShifts.filter(s => {
-                    const d = new Date(s.date);
-                    return d.getFullYear() === now.getFullYear();
-                });
-            }
-
-            // Exakte Berechnung in Stunden
-            let sortedShifts = [...activeShifts].sort((a,b) => new Date(a.date) - new Date(b.date));
-            let totalHoursExact = 0;
-            let chartDataAgg = {};
-
-            sortedShifts.forEach(s => {
-                const [sh, sm] = s.startTime.split(':').map(Number);
-                const [eh, em] = s.endTime.split(':').map(Number);
-                let mins = (eh * 60 + em) - (sh * 60 + sm);
-                if (mins < 0) mins += 24 * 60; 
-                let hrs = mins / 60;
-                
-                totalHoursExact += hrs;
-
-                let label = formatDate(s.date);
-                if (chartDataAgg[label]) chartDataAgg[label] += hrs;
-                else chartDataAgg[label] = hrs;
-            });
-
-            let chartLabels = Object.keys(chartDataAgg);
-            let chartDataPoints = Object.values(chartDataAgg);
-
-            const totalDays = activeShifts.length;
-            totalHoursExact = Math.round(totalHoursExact * 10) / 10;
-
-            let genTime = new Date().toLocaleString('de-DE', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-
-            let html = `
-                <div id="pdf-report-area" class="bg-white p-2 rounded-xl">
-                    <div class="hidden pdf-only-header mb-6 pb-4 border-b border-slate-200">
-                        <h2 class="text-2xl font-bold text-slate-900">ShogiDienste Schichtbericht</h2>
-                        <p class="text-sm text-slate-500 mt-1">Generiert am: ${genTime} Uhr</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between" data-html2canvas-ignore>
-                            <div>
-                                <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen</h4>
-                            </div>
-                            <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                <span>Als PDF exportieren</span>
-                            </button>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200" data-html2canvas-ignore>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-xs font-semibold text-slate-600 uppercase">Filter:</span>
-                                <select onchange="appState.filterMode = this.value; switchSettingsTab('extra');" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
-                                    <option value="all" ${appState.filterMode === 'all' ? 'selected' : ''}>Alle</option>
-                                    <option value="weekly" ${appState.filterMode === 'weekly' ? 'selected' : ''}>Diese Woche</option>
-                                    <option value="monthly" ${appState.filterMode === 'monthly' ? 'selected' : ''}>Diesen Monat</option>
-                                    <option value="yearly" ${appState.filterMode === 'yearly' ? 'selected' : ''}>Dieses Jahr</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Schichttage</span>
-                                <div class="text-2xl font-bold text-slate-900 mt-1">${totalDays}</div>
-                            </div>
-                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
-                                <div class="text-2xl font-bold text-emerald-600 mt-1">${totalHoursExact} Std</div>
-                            </div>
-                        </div>
-
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-                            <h5 class="text-xs font-semibold text-slate-600 uppercase mb-4">Arbeitsstunden Verlauf</h5>
-                            <div class="w-full h-64">
-                                ${chartLabels.length > 0 ? '<canvas id="shiftChart"></canvas>' : '<div class="h-full flex items-center justify-center text-sm text-slate-400">Keine Daten verfügbar</div>'}
-                            </div>
-                        </div>
-
-                        <!-- Detaillierte Tabelle für PDF -->
-                        <div class="hidden pdf-only-table mt-8">
-                            <h5 class="text-lg font-bold text-slate-800 mb-4">Schichtdetails (${sortedShifts.length})</h5>
-                            <table class="w-full text-left text-sm border-collapse">
-                                <thead>
-                                    <tr class="border-b-2 border-slate-800">
-                                        <th class="py-2 px-1">Datum</th>
-                                        <th class="py-2 px-1">Zeit</th>
-                                        <th class="py-2 px-1">Typ</th>
-                                        <th class="py-2 px-1">Abteilung / Ort</th>
-                                        <th class="py-2 px-1">Dauer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${sortedShifts.map(s => `
-                                        <tr class="border-b border-slate-200">
-                                            <td class="py-2 px-1 font-medium">${formatDate(s.date)}</td>
-                                            <td class="py-2 px-1">${s.startTime} -${s.endTime}</td>
-                                            <td class="py-2 px-1">${s.type}</td>
-                                            <td class="py-2 px-1">${s.department} /${s.location}</td>
-                                            <td class="py-2 px-1">${s.duration}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="space-y-3" data-html2canvas-ignore>
-                            <h5 class="text-sm font-bold text-slate-800">Gelöschte Schichten (${appState.deletedShifts.length})</h5>
-                            <div class="space-y-2 max-h-[200px] overflow-y-auto">
-                                ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
-                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-                                        <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
-                                        <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-emerald-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            if (chartLabels.length > 0) {
-                setTimeout(() => {
-                    initChart(chartLabels, chartDataPoints);
-                }, 100);
-            }
-        }
-
-        function promptRestoreShift(index) {
-            appState.pendingRestoreIndex = index;
-            document.getElementById('restore-confirm-modal').classList.remove('hidden');
-        }
-
-        function closeRestoreConfirmModal() {
-            document.getElementById('restore-confirm-modal').classList.add('hidden');
-            appState.pendingRestoreIndex = null;
-        }
-
-        function executeRestoreShift() {
-            if (appState.pendingRestoreIndex !== null) {
-                const shift = appState.deletedShifts.splice(appState.pendingRestoreIndex, 1)[0];
-                shift.deleted = false;
-                appState.shifts.push(shift);
-                showToast('Schicht wiederhergestellt.', 'info');
-                saveToFirebase(); // Firebase Sync
-            }
-            closeRestoreConfirmModal();
-            switchSettingsTab('extra');
-        }
-
-        async function downloadPDFReport() {
-            showToast('PDF wird generiert...', 'info');
-            const element = document.getElementById('pdf-report-area');
-            
-            const pdfHeader = element.querySelector('.pdf-only-header');
-            const pdfTable = element.querySelector('.pdf-only-table');
-            
-            if(pdfHeader) pdfHeader.classList.remove('hidden');
-            if(pdfTable) pdfTable.classList.remove('hidden');
-
-            try {
-                const canvas = await html2canvas(element, { 
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff'
-                });
-                
-                if(pdfHeader) pdfHeader.classList.add('hidden');
-                if(pdfTable) pdfTable.classList.add('hidden');
-
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
-                pdf.save(`ShogiDienste_Report_${formatDate(new Date())}.pdf`);
-                
-                showToast('PDF exportiert!', 'info');
-            } catch(e) {
-                console.error(e);
-                showToast('Fehler bei der PDF Generierung', 'error');
-                
-                if(pdfHeader) pdfHeader.classList.add('hidden');
-                if(pdfTable) pdfTable.classList.add('hidden');
-            }
-        }
-    </script>
+    <div id="app" class="min-h-full flex flex-col relative flex-1">
+
+        <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
+            <div id="particles-js" class="absolute inset-0 z-0"></div>
+            
+            <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
+
+            <div class="relative z-10 w-full max-w-md p-8 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 mx-4">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="w-12 h-12 flex items-center justify-center text-indigo-600">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">ShogiDienste</h1>
+                    </div>
+                </div>
+
+                <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Benutzername</label>
+                        <input type="text" id="username-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
+                        <span id="username-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Passwort</label>
+                        <input type="password" id="password-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all text-sm" placeholder="">
+                        <span id="password-error" class="text-xs text-red-500 mt-1.5 block hidden"></span>
+                    </div>
+
+                    <button type="submit" id="login-submit-btn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>Anmelden</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="main-app-view" class="hidden flex-1 flex flex-col bg-slate-50 min-h-screen">
+            <header class="sticky top-0 z-30 px-[0.5cm] py-4 flex items-center justify-between border-b border-slate-200/40 bg-slate-50">
+                <div class="flex items-center space-x-3 cursor-pointer group" onclick="refreshMainView()">
+                    <div class="flex items-center justify-center text-indigo-600 group-hover:text-indigo-800 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-slate-900 tracking-tight">ShogiDienste</span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="bg-slate-200/70 p-1 rounded-xl flex space-x-1 border border-slate-300/50">
+                        <button onclick="setCalendarMode('weekly')" id="mode-weekly" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all">Woche</button>
+                        <button onclick="setCalendarMode('monthly')" id="mode-monthly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Monat</button>
+                        <button onclick="setCalendarMode('yearly')" id="mode-yearly" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Jahr</button>
+                    </div>
+
+                    <button onclick="openSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center transition-colors border border-slate-200 focus:outline-none shadow-xs" title="Einstellungen">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <main class="px-[0.5cm] py-6 w-full flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 id="calendar-title" class="text-2xl font-bold text-slate-900">Wochenübersicht</h2>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeDateRange(-1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button onclick="goToCurrentDate()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold rounded-xl text-slate-700 transition-colors shadow-xs">Heute</button>
+                        <button onclick="changeDateRange(1)" class="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="calendar-container" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+                    <!-- Rendered dynamically -->
+                </div>
+            </main>
+        </div>
+
+    </div>
+
+    <!-- Spinner -->
+    <div id="global-spinner" class="fixed inset-0 z-[100] bg-slate-50/80 backdrop-blur-xl hidden flex-col items-center justify-center">
+        <div class="relative w-16 h-16 mb-4">
+            <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
+        </div>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse"></span>
+    </div>
+
+    <!-- Modals (Shift Detail) -->
+    <div id="shift-detail-modal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[50px]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
+            <div class="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Schichtdetails</h3>
+                    </div>
+                </div>
+                <button onclick="closeShiftDetailModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="shift-detail-content" class="flex-1 p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[50] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-[1cm]">
+        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200 relative">
+            <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Einstellungen</h3>
+                    </div>
+                </div>
+                <button onclick="closeSettingsModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden">
+                <div class="w-72 bg-slate-50 border-r border-slate-200 p-4 flex flex-col space-y-2">
+                    <button onclick="switchSettingsTab('add')" id="tab-btn-add" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Schicht hinzufügen</span>
+                    </button>
+                    <button onclick="switchSettingsTab('delete')" id="tab-btn-delete" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span>Schicht löschen</span>
+                    </button>
+                    <button onclick="switchSettingsTab('edit')" id="tab-btn-edit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <span>Schicht bearbeiten</span>
+                    </button>
+                    <button onclick="switchSettingsTab('extra')" id="tab-btn-extra" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span>Zusätzliche Funktionen</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 p-8 overflow-y-auto bg-slate-50" id="settings-tab-content">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modals -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">bestätigen</h4>
+            </div>
+            <div id="delete-confirm-content" class="p-6 space-y-3">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="executeDeleteShift()" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="restore-confirm-modal" class="fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">Schicht wiederherstellen bestätigen</h4>
+            </div>
+            <div class="p-6 space-y-3">
+                <p class="text-sm text-slate-600">Möchten Sie diese gelöschte Schicht wirklich wiederherstellen?</p>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeRestoreConfirmModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="executeRestoreShift()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Wiederherstellen bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-shift-modal" class="fixed inset-0 z-[80] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h4 class="font-bold text-slate-900">Schicht bearbeiten</h4>
+                <button onclick="closeEditShiftModal()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="edit-shift-content" class="p-6 space-y-4">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeEditShiftModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="saveEditedShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Änderungen speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="move-date-modal" class="fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h4 class="font-bold text-slate-900">Auf welchen Tag verschieben?</h4>
+            </div>
+            <div class="p-6 space-y-4">
+                <label class="block text-xs font-semibold text-slate-600 uppercase">Neues Datum auswählen</label>
+                <input type="date" id="move-target-date" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+                <button onclick="closeMoveDateModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="confirmMoveShift()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Verschieben</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col space-y-3 pointer-events-none"></div>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEbSWfiZ6xGL7_NoVVFpy-JkGwebb78RQ",
+            authDomain: "using-6af8b.firebaseapp.com",
+            databaseURL: "https://using-6af8b-default-rtdb.firebaseio.com",
+            projectId: "using-6af8b",
+            storageBucket: "using-6af8b.firebasestorage.app",
+            messagingSenderId: "316715965452",
+            appId: "1:316715965452:web:8a07ffdf5905a571cc2229",
+            measurementId: "G-XNXV9CRKEG"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const shiftsRef = db.ref('shogidienste/shifts');
+
+        let appState = {
+            isLoggedIn: false,
+            calendarMode: 'weekly',
+            currentDate: new Date(),
+            shifts: [],
+            deletedShifts: [],
+            addShiftRangeStart: '',
+            addShiftRangeEnd: '',
+            selectedAddDates: [],
+            addedShiftTimesData: {},
+            addShiftStep: 'dates', 
+            deleteModeActive: false,
+            selectedDeleteDate: null,
+            filterMode: 'monthly',
+            pendingRestoreIndex: null,
+            currentTab: 'add'
+        };
+
+        // Realtime Data Sync from Firebase
+        shiftsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            appState.shifts = data ? Object.values(data) : [];
+            appState.deletedShifts = appState.shifts.filter(s => s.deleted);
+            
+            if (appState.isLoggedIn) {
+                renderCalendar();
+                const settingsModal = document.getElementById('settings-modal');
+                if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                    switchSettingsTab(appState.currentTab);
+                }
+            }
+        });
+
+        function saveToFirebase() {
+            shiftsRef.set(appState.shifts);
+        }
+
+        // Chart.js instance
+        let shiftChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 60, density: { enable: true, value_area: 800 } },
+                    color: { value: "#4f46e5" }, 
+                    shape: { type: "circle" },
+                    opacity: { value: 0.3, random: false },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#4f46e5", opacity: 0.2, width: 1 },
+                    move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
+                },
+                retina_detect: true
+            });
+        });
+
+        function toLocalISODate(dateObj) {
+            const d = new Date(dateObj);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDate(dateObj) {
+            const d = new Date(dateObj);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function formatDetailDate(dateStr) {
+            const d = new Date(dateStr);
+            const weekday = d.toLocaleDateString('de-DE', { weekday: 'long' });
+            return `${formatDate(d)}, ${weekday}`;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username-input');
+            const passwordInput = document.getElementById('password-input');
+            const userErr = document.getElementById('username-error');
+            const passErr = document.getElementById('password-error');
+
+            userErr.classList.add('hidden');
+            passErr.classList.add('hidden');
+
+            let hasError = false;
+            if (!usernameInput.value.trim()) {
+                userErr.textContent = 'Benutzername darf nicht leer sein.';
+                userErr.classList.remove('hidden');
+                hasError = true;
+            } else if (usernameInput.value.trim() !== 'alex') {
+                userErr.textContent = 'Ungültiger Benutzername.';
+                userErr.classList.remove('hidden');
+                hasError = true;
+            }
+
+            if (!passwordInput.value.trim()) {
+                passErr.textContent = 'Passwort darf nicht leer sein.';
+                passErr.classList.remove('hidden');
+                hasError = true;
+            } else if (passwordInput.value.trim() !== '2911') {
+                passErr.textContent = 'Ungültiges Passwort.';
+                passErr.classList.remove('hidden');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const spinner = document.getElementById('global-spinner');
+            spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
+
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                spinner.style.display = 'none';
+                appState.isLoggedIn = true;
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('main-app-view').classList.remove('hidden');
+                showToast('Erfolgreich angemeldet.', 'info');
+                renderCalendar();
+            }, 800);
+        }
+
+        function refreshMainView() {
+            const spinner = document.getElementById('global-spinner');
+            spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                spinner.style.display = 'none';
+                appState.currentDate = new Date();
+                renderCalendar();
+                showToast('Ansicht aktualisiert.', 'info');
+            }, 500);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-5 py-4 rounded-xl shadow-xl border text-white font-medium text-sm toast-slide ${
+                type === 'error' ? 'bg-red-600 border-red-500' : 'bg-slate-900 border-slate-700'
+            }`;
+
+            const svgIcon = type === 'error' 
+                ? '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
+                : '<svg class="w-5 h-5 flex-shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+            toast.innerHTML = `${svgIcon}<span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function setCalendarMode(mode) {
+            appState.calendarMode = mode;
+            ['weekly', 'monthly', 'yearly'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-600 shadow-sm transition-all';
+                } else {
+                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+                }
+            });
+            renderCalendar();
+        }
+
+        function changeDateRange(direction) {
+            const d = new Date(appState.currentDate);
+            if (appState.calendarMode === 'weekly') {
+                d.setDate(d.getDate() + (direction * 7));
+            } else if (appState.calendarMode === 'monthly') {
+                d.setMonth(d.getMonth() + direction);
+            } else {
+                d.setFullYear(d.getFullYear() + direction);
+            }
+            appState.currentDate = d;
+            renderCalendar();
+        }
+
+        function goToCurrentDate() {
+            appState.currentDate = new Date();
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendar-container');
+            const titleEl = document.getElementById('calendar-title');
+
+            container.innerHTML = '';
+
+            if (appState.calendarMode === 'weekly') {
+                titleEl.textContent = 'Wochenübersicht';
+                renderWeeklyCalendar(container);
+            } else if (appState.calendarMode === 'monthly') {
+                titleEl.textContent = 'Monatsübersicht';
+                renderMonthlyCalendar(container);
+            } else {
+                titleEl.textContent = 'Jahresübersicht';
+                renderYearlyCalendar(container);
+            }
+        }
+
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6: 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function renderWeeklyCalendar(container) {
+            const monday = getMonday(appState.currentDate);
+            let days = [];
+            for (let i = 0; i < 7; i++) {
+                let tempD = new Date(monday);
+                tempD.setDate(monday.getDate() + i);
+                days.push(tempD);
+            }
+
+            const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+            
+            let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col relative">`;
+            
+            // მიმდინარე დროის ზუსტი გამოთვლა საათებისა და წუთების მიხედვით (+7 წუთიანი ოფსეტით)
+            const now = new Date();
+            const currentTotalMins = (now.getHours() * 60 + now.getMinutes() + 7) % (24 * 60);
+            const hourProgress = currentTotalMins / (24 * 60);
+            
+            html += `<div class="absolute top-0 bottom-0 pointer-events-none z-25" style="left: calc(160px + (100% - 160px) * ${hourProgress});">
+                <div class="current-time-slider-bar"></div>
+            </div>`;
+
+            // საათების სათაურის მწკრივი
+            html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-20" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
+            html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center sticky-day-column bg-slate-50">Wochentag</div>`;
+            for (let h = 0; h < 24; h++) {
+                const timeStr = String(h).padStart(2, '0') + ':00';
+                html += `<div class="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 text-[11px] font-semibold text-slate-500">${timeStr}</div>`;
+            }
+            html += `</div>`;
+
+            days.forEach((d, idx) => {
+                const dateStr = toLocalISODate(d);
+                const formattedDate = formatDate(d);
+                const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
+
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative ${isToday ? 'today-highlight' : ''}" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
+                
+                // Day Label
+                html += `<div class="p-3 border-r border-slate-200 flex flex-col justify-center h-full sticky-day-column ${isToday ? 'today-col' : ''}" style="grid-row: 1; grid-column: 1;">
+                    <span class="text-xs font-bold text-emerald-600">${dayNames[idx]}</span>
+                    <span class="text-[11px] text-slate-500">${formattedDate}</span>
+                </div>`;
+
+                // 24 Empty Background Cells
+                for (let i = 0; i < 24; i++) {
+                    html += `<div class="border-r border-slate-100 h-full w-full" style="grid-row: 1; grid-column: ${i + 2};"></div>`;
+                }
+
+                // Overlay Container for Absolute Shifts
+                html += `<div style="grid-row: 1; grid-column: 2 / span 24;" class="relative w-full h-full pointer-events-none">`;
+                
+                dayShifts.forEach(shift => {
+                    const [sh, sm] = shift.startTime.split(':').map(Number);
+                    const [eh, em] = shift.endTime.split(':').map(Number);
+                    
+                    let startMins = sh * 60 + sm;
+                    let endMins = eh * 60 + em;
+                    if (endMins <= startMins) endMins += 24 * 60; // Overnight
+                    
+                    let visualEndMins = endMins > 24 * 60 ? 24 * 60 : endMins;
+                    let durationMins = visualEndMins - startMins;
+
+                    const leftPerc = (startMins / (24 * 60)) * 100;
+                    const widthPerc = (durationMins / (24 * 60)) * 100;
+
+                    html += `<div onclick="openShiftDetail('${shift.id}')" style="left: ${leftPerc}%; width: ${widthPerc}%;" class="absolute top-2.5 h-[55px] bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-xl shadow-md cursor-pointer transition-all transform hover:scale-[1.01] flex flex-col justify-between z-20 overflow-hidden pointer-events-auto">
+                        <div class="flex items-center justify-between text-[11px] font-semibold gap-1 overflow-hidden">
+                            <span class="truncate">${shift.startTime}-${shift.endTime}</span>
+                            <span class="bg-emerald-500 px-1 py-0.5 rounded text-[9px] truncate flex-shrink-0">${shift.type}</span>
+                        </div>
+                        <div class="text-[10px] font-medium truncate">${shift.department}</div>
+                    </div>`;
+                });
+                
+                html += `</div>`; // End overlay
+                html += `</div>`; // End day row
+            });
+            html += `</div></div>`;
+
+            container.innerHTML = html;
+        }
+
+        function renderMonthlyCalendar(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+            
+            let html = `<div class="p-4 bg-slate-50 border-b border-slate-200 text-center font-bold text-slate-800">${monthNames[month]} ${year}</div>`;
+            html += `<div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 text-center py-2">
+                <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
+            </div>`;
+
+            html += `<div class="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-slate-100">`;
+            
+            let startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDayOfWeek; i++) {
+                html += `<div class="bg-slate-50/30 p-2 min-h-[110px]"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayShifts = appState.shifts.filter(s => !s.deleted && s.date === dateStr);
+                const hasShift = dayShifts.length > 0;
+
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                if (hasShift) {
+                    html += `<div class="p-2.5 min-h-[110px] bg-emerald-500 hover:bg-emerald-600 transition-colors flex flex-col shadow-inner cursor-pointer relative ${isToday ? 'today-highlight' : ''}" onclick="openShiftDetail('${dayShifts[0].id}')">
+                        <div class="text-xs font-bold text-white mb-2 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="space-y-2 overflow-y-auto max-h-[90px] relative z-20">`;
+                    dayShifts.forEach(shift => {
+                        html += `<div class="text-[11px] text-white flex flex-col leading-tight border-t border-emerald-400/50 pt-1 first:border-0 first:pt-0">
+                            <span class="font-bold">${shift.startTime} - ${shift.endTime}</span>
+                            <span class="text-[10px] text-emerald-100">${shift.type} (${shift.location})</span>
+                        </div>`;
+                    });
+                    html += `</div></div>`;
+                } else {
+                    html += `<div class="p-2.5 min-h-[110px] bg-white hover:bg-slate-50 transition-colors flex flex-col relative ${isToday ? 'today-highlight' : ''}">
+                        <div class="text-xs font-bold text-slate-700 relative z-20">${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}</div>
+                        <div class="text-[10px] text-slate-300 italic pt-2 relative z-20">Keine Schicht</div>
+                    </div>`;
+                }
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderYearlyCalendar(container) {
+            const year = appState.currentDate.getFullYear();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `<div class="p-6 overflow-y-auto flex-1 space-y-8">`;
+            html += `<div class="text-center font-bold text-xl text-slate-800">Jahreskalender ${year}</div>`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">`;
+
+            monthNames.forEach((mName, mIdx) => {
+                const firstD = new Date(year, mIdx, 1);
+                const lastD = new Date(year, mIdx + 1, 0);
+                
+                html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col">
+                    <div class="font-bold text-emerald-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
+                    <div class="grid grid-cols-7 text-[10px] text-slate-400 font-semibold text-center mb-1">
+                        <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-[11px] text-center">`;
+
+                let startDow = firstD.getDay() === 0 ? 6 : firstD.getDay() - 1;
+                for (let i = 0; i < startDow; i++) {
+                    html += `<div></div>`;
+                }
+                for (let d = 1; d <= lastD.getDate(); d++) {
+                    const dStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
+                    
+                    const todayStr = toLocalISODate(new Date());
+                    const isToday = dStr === todayStr;
+
+                    if (shift) {
+                        html += `<div onclick="openShiftDetail('${shift.id}')" class="py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-transform transform hover:scale-110 shadow-xs relative ${isToday ? 'today-highlight' : ''}" title="${shift.type} (${shift.startTime}-${shift.endTime})"><span class="relative z-20">${d}</span></div>`;
+                    } else {
+                        html += `<div class="py-1 rounded text-slate-600 bg-white border border-slate-100 relative ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${d}</span></div>`;
+                    }
+                }
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function openShiftDetail(shiftId) {
+            const shift = appState.shifts.find(s => s.id === shiftId);
+            if (!shift) return;
+
+            const formattedDetail = formatDetailDate(shift.date);
+            const content = document.getElementById('shift-detail-content');
+            content.innerHTML = `
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Datum</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${formattedDetail}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Schichttyp</span>
+                    <span class="text-lg font-bold text-emerald-600 mt-1">${shift.type}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Start- und Endzeit</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.startTime} - ${shift.endTime}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Arbeitsdauer</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.duration}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abteilung</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.department}</span>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col justify-center">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Einsatzort</span>
+                    <span class="text-lg font-bold text-slate-900 mt-1">${shift.location}</span>
+                </div>
+            `;
+            document.getElementById('shift-detail-modal').classList.remove('hidden');
+        }
+
+        function closeShiftDetailModal() {
+            document.getElementById('shift-detail-modal').classList.add('hidden');
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            appState.addShiftStep = 'dates';
+            switchSettingsTab(appState.currentTab);
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            renderCalendar();
+        }
+
+        function switchSettingsTab(tabName) {
+            appState.currentTab = tabName;
+            ['add', 'delete', 'edit', 'extra'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left';
+                } else {
+                    btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left';
+                }
+            });
+
+            const contentArea = document.getElementById('settings-tab-content');
+            if (tabName === 'add') renderAddShiftTab(contentArea);
+            else if (tabName === 'delete') renderDeleteShiftTab(contentArea);
+            else if (tabName === 'edit') renderEditShiftTab(contentArea);
+            else if (tabName === 'extra') renderExtraFunctionsTab(contentArea);
+        }
+
+        function renderAddShiftTab(container) {
+            if (appState.addShiftStep === 'times') {
+                renderAddShiftTimesStep(container);
+                return;
+            }
+
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">Schichten hinzufügen</h4>
+                        </div>
+                        <button onclick="goToAddTimesStep()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Zeiten festlegen</button>
+                    </div>
+
+                    <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Von Datum</label>
+                            <input type="date" id="add-start-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeStart}">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Bis Datum</label>
+                            <input type="date" id="add-end-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" value="${appState.addShiftRangeEnd}">
+                        </div>
+                        <div class="pt-5">
+                            <button onclick="confirmDateRangeSelection()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Bereich markieren</button>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden p-6 bg-slate-50/50">
+                        <div class="text-sm font-bold text-slate-800 mb-4">${monthNames[month]} ${year} (Ausgewählte Tage: ${appState.selectedAddDates.length})</div>
+                        <div class="grid grid-cols-7 text-xs font-semibold text-slate-400 text-center mb-2">
+                            <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isSelected = appState.selectedAddDates.includes(dStr);
+                const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
+                
+                let bgClass = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
+                if (isSelected) {
+                    bgClass = 'bg-emerald-700 text-white border-emerald-800 shadow-md';
+                } else if (hasShift) {
+                    bgClass = 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
+                }
+                
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dStr === todayStr;
+
+                html += `<div onclick="toggleDateSelection('${dStr}')" class="p-3 rounded-xl border text-center text-xs font-bold cursor-pointer transition-all relative ${bgClass} ${isToday ? 'today-highlight' : ''}"><span class="relative z-20">${day}</span></div>`;
+            }
+
+            html += `</div></div></div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleDateSelection(dateStr) {
+            if (appState.selectedAddDates.includes(dateStr)) {
+                appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
+            } else {
+                appState.selectedAddDates.push(dateStr);
+            }
+            switchSettingsTab('add');
+        }
+
+        function confirmDateRangeSelection() {
+            const start = document.getElementById('add-start-date').value;
+            const end = document.getElementById('add-end-date').value;
+            if (!start || !end) {
+                showToast('Bitte Start- und Enddatum auswählen.', 'error');
+                return;
+            }
+            appState.addShiftRangeStart = start;
+            appState.addShiftRangeEnd = end;
+
+            let startDate = new Date(start);
+            let endDate = new Date(end);
+            if (startDate > endDate) {
+                showToast('Das Startdatum darf nicht nach dem Enddatum liegen.', 'error');
+                return;
+            }
+
+            let dates = [];
+            let curr = new Date(startDate);
+            while (curr <= endDate) {
+                dates.push(toLocalISODate(curr));
+                curr.setDate(curr.getDate() + 1);
+            }
+            appState.selectedAddDates = dates;
+            showToast(`${dates.length} Tage markiert.`, 'info');
+            switchSettingsTab('add');
+        }
+
+        function goToAddTimesStep() {
+            if (appState.selectedAddDates.length === 0) return;
+            appState.addShiftStep = 'times';
+            switchSettingsTab('add');
+        }
+
+        function renderAddShiftTimesStep(container) {
+            let html = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">Zeiten für ausgewählte Tage festlegen</h4>
+                        </div>
+                        <button onclick="appState.addShiftStep = 'dates'; switchSettingsTab('add');" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Zurück zur Kalenderauswahl</button>
+                    </div>
+
+                    <div class="space-y-3 max-h-[450px] overflow-y-auto pr-2">
+            `;
+
+            appState.selectedAddDates.forEach(dateStr => {
+                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: '', loc: '' };
+                html += `
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-4">
+                        <div class="w-40 font-bold text-xs text-slate-800 leading-tight">${formatDetailDate(dateStr)}</div>
+                        <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        
+                        <div class="flex-1 grid grid-cols-5 gap-2">
+                            <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="07:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="15:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <div class="flex items-center justify-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-xl border border-emerald-100 text-center" id="type-badge-${dateStr}">${existingTime.type}</div>
+                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                            <input type="text" id="dept-${dateStr}" value="${existingTime.dept}" placeholder="Abteilung" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        
+                        <button onclick="removeAddedDateIfNoTime('${dateStr}')" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Tag entfernen">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>
+                <div class="flex justify-end pt-4 border-t border-slate-200">
+                    <button id="save-added-shifts-btn" onclick="saveAddedShifts()" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Alle Schichten speichern</button>
+                </div>
+            </div>`;
+            container.innerHTML = html;
+            checkSaveAddedShiftsReady();
+        }
+
+        function handleTimeInput(e, dateStr, field) {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length >= 2 && !val.includes(':')) {
+                val = val.substring(0, 2) + ':' + val.substring(2, 4);
+            }
+            e.target.value = val;
+            
+            if (field === 'start' && val.length === 5) {
+                const endInput = document.getElementById(`time-end-${dateStr}`);
+                if (endInput) endInput.focus();
+            }
+
+            updateAddedShiftData(dateStr);
+        }
+
+        function autoCalculateShiftType(startTime) {
+            if (!startTime || startTime.length < 5) return 'Frühdienst';
+            const hour = parseInt(startTime.split(':')[0], 10);
+            if (hour >= 5 && hour < 14) return 'Frühdienst';
+            if (hour >= 14 && hour < 22) return 'Spätdienst';
+            return 'Nachtdienst';
+        }
+
+        function updateAddedShiftData(dateStr) {
+            const startInput = document.getElementById(`time-start-${dateStr}`);
+            const endInput = document.getElementById(`time-end-${dateStr}`);
+            const locInput = document.getElementById(`loc-${dateStr}`);
+            const deptInput = document.getElementById(`dept-${dateStr}`);
+            
+            const start = startInput ? startInput.value : '';
+            const end = endInput ? endInput.value : '';
+            const loc = locInput ? locInput.value : '';
+            const dept = deptInput ? deptInput.value : '';
+            
+            const calculatedType = autoCalculateShiftType(start);
+
+            const badge = document.getElementById(`type-badge-${dateStr}`);
+            if(badge) badge.textContent = calculatedType;
+
+            if (start && end) {
+                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept, loc };
+            } else {
+                delete appState.addedShiftTimesData[dateStr];
+            }
+            checkSaveAddedShiftsReady();
+        }
+
+        function checkSaveAddedShiftsReady() {
+            const saveBtn = document.getElementById('save-added-shifts-btn');
+            if(!saveBtn) return;
+            const allHaveTimes = appState.selectedAddDates.length > 0 && appState.selectedAddDates.every(d => {
+                const data = appState.addedShiftTimesData[d];
+                return data && data.start && data.end;
+            });
+            saveBtn.disabled = !allHaveTimes;
+        }
+
+        function removeAddedDateIfNoTime(dateStr) {
+            const data = appState.addedShiftTimesData[dateStr];
+            if (data && (data.start || data.end)) {
+                showToast('Kann nicht entfernt werden.', 'error');
+                return;
+            }
+            appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
+            delete appState.addedShiftTimesData[dateStr];
+            switchSettingsTab('add');
+        }
+
+        function saveAddedShifts() {
+            appState.selectedAddDates.forEach(dateStr => {
+                const data = appState.addedShiftTimesData[dateStr];
+                if (data && data.start && data.end) {
+                    const [sh, sm] = data.start.split(':').map(Number);
+                    const [eh, em] = data.end.split(':').map(Number);
+                    let diffMins = (eh * 60 + em) - (sh * 60 + sm);
+                    if (diffMins < 0) diffMins += 24 * 60;
+                    const hours = Math.floor(diffMins / 60);
+                    const mins = diffMins % 60;
+                    const durationStr = `${hours}h ${mins}m`;
+
+                    appState.shifts.push({
+                        id: 's_' + Date.now() + Math.random(),
+                        date: dateStr,
+                        day: new Date(dateStr).toLocaleDateString('de-DE', { weekday: 'long' }),
+                        type: data.type,
+                        startTime: data.start,
+                        endTime: data.end,
+                        duration: durationStr,
+                        department: data.dept || 'Intensivmedizin',
+                        location: data.loc || 'Station A',
+                        deleted: false
+                    });
+                }
+            });
+            appState.selectedAddDates = [];
+            appState.addedShiftTimesData = {};
+            appState.addShiftStep = 'dates';
+            showToast('Schichten hinzugefügt.', 'info');
+            saveToFirebase(); // Firebase Sync
+            switchSettingsTab('add');
+        }
+
+        function renderDeleteShiftTab(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+            
+            let html = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900">Schichten löschen</h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Monat: ${monthNames[month]} ${year}</p>
+                        </div>
+                        <button onclick="toggleDeleteMode()" class="px-5 py-2.5 ${appState.deleteModeActive ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} rounded-xl text-sm font-semibold transition-all shadow-sm">
+                            ${appState.deleteModeActive ? 'beenden' : 'aktivieren'}
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
+                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
+            });
+
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div class="p-4 min-h-[100px] border-b border-r border-slate-200/50"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div class="p-3 min-h-[100px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500' : 'bg-white'} ${isToday ? 'today-highlight' : ''} flex flex-col justify-between relative transition-colors">
+                        <div class="flex justify-between items-center relative z-20">
+                            <span class="text-xs font-bold ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(`${year}-${month+1}-${day}`)}</span>
+                            ${appState.deleteModeActive && shift ? `<button onclick="promptDeleteShift('${shift.id}')" class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-700 text-white flex items-center justify-center transition-all shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </button>` : ''}
+                        </div>
+                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span>${shift.startTime}-${shift.endTime}</div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
+                </div>`;
+            }
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleDeleteMode() {
+            appState.deleteModeActive = !appState.deleteModeActive;
+            switchSettingsTab('delete');
+        }
+
+        let pendingDeleteShiftId = null;
+        function promptDeleteShift(shiftId) {
+            pendingDeleteShiftId = shiftId;
+            const shift = appState.shifts.find(s => s.id === shiftId);
+            if (!shift) return;
+
+            const formattedDetail = formatDetailDate(shift.date);
+            const content = document.getElementById('delete-confirm-content');
+            content.innerHTML = `
+                <p class="text-sm text-slate-600 font-semibold">Möchten Sie diese Schicht wirklich löschen?</p>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                    <div><strong>Tag & Datum:</strong> ${formattedDetail}</div>
+                    <div><strong>Schichttyp:</strong> ${shift.type}</div>
+                    <div><strong>Zeit:</strong> ${shift.startTime} - ${shift.endTime} (${shift.duration})</div>
+                    <div><strong>Einsatzort:</strong> ${shift.location}, ${shift.department}</div>
+                </div>
+            `;
+            document.getElementById('delete-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteConfirmModal() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+        }
+
+        function executeDeleteShift() {
+            const shift = appState.shifts.find(s => s.id === pendingDeleteShiftId);
+            if (shift) {
+                shift.deleted = true;
+                appState.deletedShifts.push(shift);
+                showToast('Schicht gelöscht.', 'info');
+                saveToFirebase(); // Firebase Sync
+            }
+            closeDeleteConfirmModal();
+            appState.deleteModeActive = false;
+            switchSettingsTab('delete');
+        }
+
+        let currentEditingShiftId = null;
+        function renderEditShiftTab(container) {
+            const year = appState.currentDate.getFullYear();
+            const month = appState.currentDate.getMonth();
+            const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900">Schichten bearbeiten</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Klicken Sie auf ein Datum, um Details zu ändern oder zu verschieben (${monthNames[month]} ${year})</p>
+                    </div>
+
+                    <div class="grid grid-cols-7 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+            `;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'].forEach(d => {
+                html += `<div class="p-2 text-center text-xs font-bold text-slate-400 border-b border-r border-slate-200 bg-white">${d}</div>`;
+            });
+
+            let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            for (let i = 0; i < startDow; i++) {
+                html += `<div class="p-4 min-h-[90px] border-b border-r border-slate-200/50"></div>`;
+            }
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+
+                const todayStr = toLocalISODate(new Date());
+                const isToday = dateStr === todayStr;
+
+                html += `<div onclick="handleEditDateClick('${dateStr}')" class="p-3 min-h-[90px] border-b border-r border-slate-200 ${shift ? 'bg-emerald-500 hover:bg-emerald-600 shadow-inner' : 'bg-white hover:bg-slate-50'} ${isToday ? 'today-highlight' : ''} transition-colors cursor-pointer flex flex-col justify-between relative">
+                        <span class="text-xs font-bold relative z-20 ${shift ? 'text-white' : 'text-slate-700'}">${formatDate(dateStr)}</span>
+                        ${shift ? `<div class="text-[11px] text-emerald-100 flex flex-col leading-tight border-t border-emerald-400/50 pt-1 mt-1 relative z-20"><span class="font-bold text-white">${shift.type}</span></div>` : '<span class="text-[10px] text-slate-300 relative z-20">Keine Schicht</span>'}
+                </div>`;
+            }
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function handleEditDateClick(dateStr) {
+            const shift = appState.shifts.find(s => !s.deleted && s.date === dateStr);
+            if (!shift) {
+                showToast(`An diesem Tag (${formatDate(dateStr)}) ist keine Schicht vorhanden.`, 'info');
+                return;
+            }
+            currentEditingShiftId = shift.id;
+            const content = document.getElementById('edit-shift-content');
+            content.innerHTML = `
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Datum</label>
+                    <input type="text" disabled value="${formatDetailDate(shift.date)}" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Startzeit</label>
+                        <input type="text" id="edit-start" maxlength="5" value="${shift.startTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Endzeit</label>
+                        <input type="text" id="edit-end" maxlength="5" value="${shift.endTime}" oninput="handleEditTimeAutoType(event)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ort</label>
+                        <input type="text" id="edit-loc" value="${shift.location}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Abteilung</label>
+                        <input type="text" id="edit-dept" value="${shift.department}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm">
+                    </div>
+                </div>
+                <div>
+                    <button onclick="openMoveDateModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors border border-slate-200">Schicht auf anderen Tag verschieben</button>
+                </div>
+            `;
+            document.getElementById('edit-shift-modal').classList.remove('hidden');
+        }
+
+        function handleEditTimeAutoType(e) {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length >= 2 && !val.includes(':')) {
+                val = val.substring(0, 2) + ':' + val.substring(2, 4);
+            }
+            e.target.value = val;
+        }
+
+        function closeEditShiftModal() {
+            document.getElementById('edit-shift-modal').classList.add('hidden');
+        }
+
+        function saveEditedShift() {
+            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
+            if (!shift) return;
+
+            const start = document.getElementById('edit-start').value;
+            const end = document.getElementById('edit-end').value;
+            shift.startTime = start;
+            shift.endTime = end;
+            shift.type = autoCalculateShiftType(start);
+            shift.location = document.getElementById('edit-loc').value;
+            shift.department = document.getElementById('edit-dept').value;
+
+            closeEditShiftModal();
+            showToast('Schicht aktualisiert.', 'info');
+            saveToFirebase(); // Firebase Sync
+            switchSettingsTab('edit');
+        }
+
+        function openMoveDateModal() {
+            document.getElementById('move-date-modal').classList.remove('hidden');
+        }
+
+        function closeMoveDateModal() {
+            document.getElementById('move-date-modal').classList.add('hidden');
+        }
+
+        function confirmMoveShift() {
+            const targetDate = document.getElementById('move-target-date').value;
+            if (!targetDate) {
+                showToast('Bitte ein Zieldatum auswählen.', 'error');
+                return;
+            }
+            const shift = appState.shifts.find(s => s.id === currentEditingShiftId);
+            if (shift) {
+                shift.date = targetDate;
+                shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
+                showToast(`Schicht auf ${formatDate(targetDate)} verschoben.`, 'info');
+                saveToFirebase(); // Firebase Sync
+            }
+            closeMoveDateModal();
+            closeEditShiftModal();
+            switchSettingsTab('edit');
+        }
+
+        function initChart(labels, dataPoints) {
+            const canvas = document.getElementById('shiftChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            if (shiftChartInstance) {
+                shiftChartInstance.destroy();
+            }
+
+            shiftChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Arbeitsstunden',
+                        data: dataPoints,
+                        backgroundColor: '#059669', // emerald-600
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Stunden' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Datum' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderExtraFunctionsTab(container) {
+            let activeShifts = appState.shifts.filter(s => !s.deleted);
+            const now = new Date();
+
+            if (appState.filterMode === 'weekly') {
+                const monday = getMonday(now);
+                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= monday && d <= sunday;
+                });
+            } else if (appState.filterMode === 'monthly') {
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                });
+            } else if (appState.filterMode === 'yearly') {
+                activeShifts = activeShifts.filter(s => {
+                    const d = new Date(s.date);
+                    return d.getFullYear() === now.getFullYear();
+                });
+            }
+
+            // Exakte Berechnung in Stunden
+            let sortedShifts = [...activeShifts].sort((a,b) => new Date(a.date) - new Date(b.date));
+            let totalHoursExact = 0;
+            let chartDataAgg = {};
+
+            sortedShifts.forEach(s => {
+                const [sh, sm] = s.startTime.split(':').map(Number);
+                const [eh, em] = s.endTime.split(':').map(Number);
+                let mins = (eh * 60 + em) - (sh * 60 + sm);
+                if (mins < 0) mins += 24 * 60; 
+                let hrs = mins / 60;
+                
+                totalHoursExact += hrs;
+
+                let label = formatDate(s.date);
+                if (chartDataAgg[label]) chartDataAgg[label] += hrs;
+                else chartDataAgg[label] = hrs;
+            });
+
+            let chartLabels = Object.keys(chartDataAgg);
+            let chartDataPoints = Object.values(chartDataAgg);
+
+            const totalDays = activeShifts.length;
+            totalHoursExact = Math.round(totalHoursExact * 10) / 10;
+
+            let genTime = new Date().toLocaleString('de-DE', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            let html = `
+                <div id="pdf-report-area" class="bg-white p-2 rounded-xl">
+                    <div class="hidden pdf-only-header mb-6 pb-4 border-b border-slate-200">
+                        <h2 class="text-2xl font-bold text-slate-900">ShogiDienste Schichtbericht</h2>
+                        <p class="text-sm text-slate-500 mt-1">Generiert am: ${genTime} Uhr</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between" data-html2canvas-ignore>
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-900">Zusätzliche Funktionen</h4>
+                            </div>
+                            <button onclick="downloadPDFReport()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span>Als PDF exportieren</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200" data-html2canvas-ignore>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xs font-semibold text-slate-600 uppercase">Filter:</span>
+                                <select onchange="appState.filterMode = this.value; switchSettingsTab('extra');" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium">
+                                    <option value="all" ${appState.filterMode === 'all' ? 'selected' : ''}>Alle</option>
+                                    <option value="weekly" ${appState.filterMode === 'weekly' ? 'selected' : ''}>Diese Woche</option>
+                                    <option value="monthly" ${appState.filterMode === 'monthly' ? 'selected' : ''}>Diesen Monat</option>
+                                    <option value="yearly" ${appState.filterMode === 'yearly' ? 'selected' : ''}>Dieses Jahr</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Schichttage</span>
+                                <div class="text-2xl font-bold text-slate-900 mt-1">${totalDays}</div>
+                            </div>
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-semibold text-slate-400 uppercase">Gefilterte Arbeitsstunden</span>
+                                <div class="text-2xl font-bold text-emerald-600 mt-1">${totalHoursExact} Std</div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h5 class="text-xs font-semibold text-slate-600 uppercase mb-4">Arbeitsstunden Verlauf</h5>
+                            <div class="w-full h-64">
+                                ${chartLabels.length > 0 ? '<canvas id="shiftChart"></canvas>' : '<div class="h-full flex items-center justify-center text-sm text-slate-400">Keine Daten verfügbar</div>'}
+                            </div>
+                        </div>
+
+                        <!-- Detaillierte Tabelle für PDF -->
+                        <div class="hidden pdf-only-table mt-8">
+                            <h5 class="text-lg font-bold text-slate-800 mb-4">Schichtdetails (${sortedShifts.length})</h5>
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="border-b-2 border-slate-800">
+                                        <th class="py-2 px-1">Datum</th>
+                                        <th class="py-2 px-1">Zeit</th>
+                                        <th class="py-2 px-1">Typ</th>
+                                        <th class="py-2 px-1">Abteilung / Ort</th>
+                                        <th class="py-2 px-1">Dauer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sortedShifts.map(s => `
+                                        <tr class="border-b border-slate-200">
+                                            <td class="py-2 px-1 font-medium">${formatDate(s.date)}</td>
+                                            <td class="py-2 px-1">${s.startTime} -${s.endTime}</td>
+                                            <td class="py-2 px-1">${s.type}</td>
+                                            <td class="py-2 px-1">${s.department} /${s.location}</td>
+                                            <td class="py-2 px-1">${s.duration}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="space-y-3" data-html2canvas-ignore>
+                            <h5 class="text-sm font-bold text-slate-800">Gelöschte Schichten (${appState.deletedShifts.length})</h5>
+                            <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                                ${appState.deletedShifts.length === 0 ? '<p class="text-xs text-slate-400">Keine gelöschten Schichten vorhanden.</p>' : appState.deletedShifts.map((s, idx) => `
+                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                                        <span>${formatDate(s.date)} -${s.type} (${s.startTime} -${s.endTime})</span>
+                                        <button onclick="promptRestoreShift(${idx})" class="px-3 py-1 bg-white hover:bg-slate-100 text-emerald-600 font-semibold rounded-lg border border-slate-200 transition-colors">Wiederherstellen</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            if (chartLabels.length > 0) {
+                setTimeout(() => {
+                    initChart(chartLabels, chartDataPoints);
+                }, 100);
+            }
+        }
+
+        function promptRestoreShift(index) {
+            appState.pendingRestoreIndex = index;
+            document.getElementById('restore-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeRestoreConfirmModal() {
+            document.getElementById('restore-confirm-modal').classList.add('hidden');
+            appState.pendingRestoreIndex = null;
+        }
+
+        function executeRestoreShift() {
+            if (appState.pendingRestoreIndex !== null) {
+                const shift = appState.deletedShifts.splice(appState.pendingRestoreIndex, 1)[0];
+                shift.deleted = false;
+                appState.shifts.push(shift);
+                showToast('Schicht wiederhergestellt.', 'info');
+                saveToFirebase(); // Firebase Sync
+            }
+            closeRestoreConfirmModal();
+            switchSettingsTab('extra');
+        }
+
+        async function downloadPDFReport() {
+            showToast('PDF wird generiert...', 'info');
+            const element = document.getElementById('pdf-report-area');
+            
+            const pdfHeader = element.querySelector('.pdf-only-header');
+            const pdfTable = element.querySelector('.pdf-only-table');
+            
+            if(pdfHeader) pdfHeader.classList.remove('hidden');
+            if(pdfTable) pdfTable.classList.remove('hidden');
+
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                if(pdfHeader) pdfHeader.classList.add('hidden');
+                if(pdfTable) pdfTable.classList.add('hidden');
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
+                pdf.save(`ShogiDienste_Report_${formatDate(new Date())}.pdf`);
+                
+                showToast('PDF exportiert!', 'info');
+            } catch(e) {
+                console.error(e);
+                showToast('Fehler bei der PDF Generierung', 'error');
+                
+                if(pdfHeader) pdfHeader.classList.add('hidden');
+                if(pdfTable) pdfTable.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
