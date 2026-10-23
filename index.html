@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShogiDienste Schichtplaner</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Libraries for PDF and Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    
+
     <!-- Firebase JS SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -59,17 +59,16 @@
             background: #94a3b8;
         }
 
-        /* ციმციმის ანიმაცია სტაფილოსფერი (Orange) აქცენტით */
         @keyframes pulse-today-border {
-            0%, 100% { 
-                border-color: rgba(249, 115, 22, 0.4); 
-                background-color: rgba(249, 115, 22, 0.05); 
-                box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); 
+            0%, 100% {
+                border-color: rgba(249, 115, 22, 0.4);
+                background-color: rgba(249, 115, 22, 0.05);
+                box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
             }
-            50% { 
-                border-color: rgba(249, 115, 22, 1); 
-                background-color: rgba(249, 115, 22, 0.2); 
-                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6); 
+            50% {
+                border-color: rgba(249, 115, 22, 1);
+                background-color: rgba(249, 115, 22, 0.2);
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
             }
         }
         .today-highlight {
@@ -108,8 +107,8 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 38px; /* ზუსტად 1 სმ */
-            background-color: rgba(249, 115, 22, 0.6); /* 60% გამჭვირვალობის სტაფილოსფერი */
+            width: 38px;
+            background-color: rgba(249, 115, 22, 0.6);
             pointer-events: none;
             z-index: 25;
             transform: translateX(-50%);
@@ -121,10 +120,10 @@
             position: sticky;
             left: 0;
             z-index: 30;
-            background-color: #ffffff !important; /* მყარი თეთრი ფონი */
+            background-color: #ffffff !important;
         }
         .sticky-day-column.today-col {
-            background-color: #ffffff !important; /* მყარი თეთრი ფონი მიმდინარე დღისთვისაც */
+            background-color: #ffffff !important;
         }
 
         #calendar-container {
@@ -139,7 +138,7 @@
 
         <div id="login-view" class="fixed inset-0 z-[50] flex items-center justify-center bg-gradient-to-tr from-slate-50 via-indigo-50/50 to-teal-50/50 overflow-hidden">
             <div id="particles-js" class="absolute inset-0 z-0"></div>
-            
+
             <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl floating-shape-1 pointer-events-none"></div>
             <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-3xl floating-shape-2 pointer-events-none"></div>
 
@@ -295,6 +294,13 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         <span>Zusätzliche Funktionen</span>
                     </button>
+                    <button onclick="switchSettingsTab('manage')" id="tab-btn-manage" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-all text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Orte & Abteilungen verwalten</span>
+                    </button>
                 </div>
 
                 <div class="flex-1 p-8 overflow-y-auto bg-slate-50" id="settings-tab-content">
@@ -369,6 +375,79 @@
         </div>
     </div>
 
+    <!-- Add Item Modal (Ort/Abteilung) -->
+<div id="add-item-modal" class="fixed inset-0 z-[95] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center p-12">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <h4 id="add-item-title" class="font-bold text-slate-900">Hinzufügen</h4>
+        </div>
+        <div class="p-6 space-y-4">
+            <label class="block text-xs font-semibold text-slate-600 uppercase">Name</label>
+            <input type="text" id="add-item-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="">
+            <span id="add-item-error" class="text-xs text-red-500 block hidden"></span>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3">
+            <button onclick="closeAddItemModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+            <button onclick="confirmAddItem()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Hinzufügen</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal für "Alle Daten gleichzeitig ausfüllen" -->
+    <div id="bulk-fill-modal" class="fixed inset-0 z-[95] bg-slate-950/60 backdrop-blur-md hidden flex items-center justify-center" style="padding-top: 2cm; padding-bottom: 2cm; padding-left: 3cm; padding-right: 3cm;">
+        <div class="bg-white rounded-3xl shadow-2xl w-full h-full flex flex-col overflow-hidden border border-slate-200">
+            <div class="px-8 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50 flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Alle Daten gleichzeitig ausfüllen</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Wird auf alle ausgewählten Tage angewendet</p>
+                    </div>
+                </div>
+                <button onclick="closeBulkFillModal()" class="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors shadow-xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 p-8 overflow-y-auto space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Schichttyp</label>
+                    <select id="bulk-type" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="">— Bitte wählen —</option>
+                        <option value="Frühdienst">Frühdienst (07:00 – 14:30)</option>
+                        <option value="Zwischendienst">Zwischendienst (12:00 – 18:30)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Einsatzort</label>
+                    <select id="bulk-loc" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="">— Bitte wählen —</option>
+                        ${'' /* filled dynamically */}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Abteilung</label>
+                    <select id="bulk-dept" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="">— Bitte wählen —</option>
+                    </select>
+                </div>
+
+                <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <p class="text-xs text-amber-800">
+                        <strong>Achtung:</strong> Diese Auswahl wird auf alle <span id="bulk-count">0</span> ausgewählten Tage angewendet und überschreibt bereits gesetzte Werte.
+                    </p>
+                </div>
+            </div>
+            <div class="px-8 py-4 border-t border-slate-200 bg-slate-50 flex justify-end space-x-3 flex-shrink-0">
+                <button onclick="closeBulkFillModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Abbrechen</button>
+                <button onclick="applyBulkFill()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Auf alle anwenden</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col space-y-3 pointer-events-none"></div>
 
     <script>
@@ -386,6 +465,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const shiftsRef = db.ref('shogidienste/shifts');
+        const locationsRef = db.ref('shogidienste/locations');
+        const departmentsRef = db.ref('shogidienste/departments');
 
         let appState = {
             isLoggedIn: false,
@@ -397,12 +478,19 @@
             addShiftRangeEnd: '',
             selectedAddDates: [],
             addedShiftTimesData: {},
-            addShiftStep: 'dates', 
+            addShiftStep: 'dates',
             deleteModeActive: false,
             selectedDeleteDate: null,
             filterMode: 'monthly',
             pendingRestoreIndex: null,
-            currentTab: 'add'
+            currentTab: 'add',
+
+            locations: [],
+            departments: [],
+            shiftPresets: {
+                'Frühdienst':     { start: '07:00', end: '14:30' },
+                'Zwischendienst': { start: '12:00', end: '18:30' }
+            }
         };
 
         // Realtime Data Sync from Firebase
@@ -410,9 +498,31 @@
             const data = snapshot.val();
             appState.shifts = data ? Object.values(data) : [];
             appState.deletedShifts = appState.shifts.filter(s => s.deleted);
-            
+
             if (appState.isLoggedIn) {
                 renderCalendar();
+                const settingsModal = document.getElementById('settings-modal');
+                if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                    switchSettingsTab(appState.currentTab);
+                }
+            }
+        });
+
+        locationsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            appState.locations = data ? Object.values(data) : [];
+            if (appState.isLoggedIn) {
+                const settingsModal = document.getElementById('settings-modal');
+                if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                    switchSettingsTab(appState.currentTab);
+                }
+            }
+        });
+
+        departmentsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            appState.departments = data ? Object.values(data) : [];
+            if (appState.isLoggedIn) {
                 const settingsModal = document.getElementById('settings-modal');
                 if (settingsModal && !settingsModal.classList.contains('hidden')) {
                     switchSettingsTab(appState.currentTab);
@@ -424,14 +534,13 @@
             shiftsRef.set(appState.shifts);
         }
 
-        // Chart.js instance
         let shiftChartInstance = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             particlesJS('particles-js', {
                 particles: {
                     number: { value: 60, density: { enable: true, value_area: 800 } },
-                    color: { value: "#4f46e5" }, 
+                    color: { value: "#4f46e5" },
                     shape: { type: "circle" },
                     opacity: { value: 0.3, random: false },
                     size: { value: 3, random: true },
@@ -537,7 +646,7 @@
                 type === 'error' ? 'bg-red-600 border-red-500' : 'bg-slate-900 border-slate-700'
             }`;
 
-            const svgIcon = type === 'error' 
+            const svgIcon = type === 'error'
                 ? '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
                 : '<svg class="w-5 h-5 flex-shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
 
@@ -618,19 +727,17 @@
             }
 
             const dayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
-            
+
             let html = `<div class="overflow-x-auto flex-1 flex flex-col"><div class="min-w-[1600px] flex flex-col relative">`;
-            
-            // მიმდინარე დროის ზუსტი გამოთვლა საათებისა და წუთების მიხედვით (+7 წუთიანი ოფსეტით)
+
             const now = new Date();
             const currentTotalMins = (now.getHours() * 60 + now.getMinutes() + 7) % (24 * 60);
             const hourProgress = currentTotalMins / (24 * 60);
-            
+
             html += `<div class="absolute top-0 bottom-0 pointer-events-none z-25" style="left: calc(160px + (100% - 160px) * ${hourProgress});">
                 <div class="current-time-slider-bar"></div>
             </div>`;
 
-            // საათების სათაურის მწკრივი
             html += `<div class="grid border-b border-slate-200 bg-slate-50 sticky top-0 z-20" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr));">`;
             html += `<div class="p-3 text-xs font-bold text-slate-500 text-center border-r border-slate-200 flex items-center justify-center sticky-day-column bg-slate-50">Wochentag</div>`;
             for (let h = 0; h < 24; h++) {
@@ -648,29 +755,26 @@
                 const isToday = dateStr === todayStr;
 
                 html += `<div class="grid border-b border-slate-100 h-[75px] items-center relative ${isToday ? 'today-highlight' : ''}" style="grid-template-columns: 160px repeat(24, minmax(60px, 1fr)); grid-template-rows: 1fr;">`;
-                
-                // Day Label
+
                 html += `<div class="p-3 border-r border-slate-200 flex flex-col justify-center h-full sticky-day-column ${isToday ? 'today-col' : ''}" style="grid-row: 1; grid-column: 1;">
                     <span class="text-xs font-bold text-emerald-600">${dayNames[idx]}</span>
                     <span class="text-[11px] text-slate-500">${formattedDate}</span>
                 </div>`;
 
-                // 24 Empty Background Cells
                 for (let i = 0; i < 24; i++) {
                     html += `<div class="border-r border-slate-100 h-full w-full" style="grid-row: 1; grid-column: ${i + 2};"></div>`;
                 }
 
-                // Overlay Container for Absolute Shifts
                 html += `<div style="grid-row: 1; grid-column: 2 / span 24;" class="relative w-full h-full pointer-events-none">`;
-                
+
                 dayShifts.forEach(shift => {
                     const [sh, sm] = shift.startTime.split(':').map(Number);
                     const [eh, em] = shift.endTime.split(':').map(Number);
-                    
+
                     let startMins = sh * 60 + sm;
                     let endMins = eh * 60 + em;
-                    if (endMins <= startMins) endMins += 24 * 60; // Overnight
-                    
+                    if (endMins <= startMins) endMins += 24 * 60;
+
                     let visualEndMins = endMins > 24 * 60 ? 24 * 60 : endMins;
                     let durationMins = visualEndMins - startMins;
 
@@ -685,9 +789,9 @@
                         <div class="text-[10px] font-medium truncate">${shift.department}</div>
                     </div>`;
                 });
-                
-                html += `</div>`; // End overlay
-                html += `</div>`; // End day row
+
+                html += `</div>`;
+                html += `</div>`;
             });
             html += `</div></div>`;
 
@@ -701,14 +805,14 @@
             const lastDay = new Date(year, month + 1, 0);
 
             const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            
+
             let html = `<div class="p-4 bg-slate-50 border-b border-slate-200 text-center font-bold text-slate-800">${monthNames[month]} ${year}</div>`;
             html += `<div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 text-center py-2">
                 <div>Montag</div><div>Dienstag</div><div>Mittwoch</div><div>Donnerstag</div><div>Freitag</div><div>Samstag</div><div>Sonntag</div>
             </div>`;
 
             html += `<div class="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-slate-100">`;
-            
+
             let startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
             for (let i = 0; i < startDayOfWeek; i++) {
                 html += `<div class="bg-slate-50/30 p-2 min-h-[110px]"></div>`;
@@ -755,7 +859,7 @@
             monthNames.forEach((mName, mIdx) => {
                 const firstD = new Date(year, mIdx, 1);
                 const lastD = new Date(year, mIdx + 1, 0);
-                
+
                 html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col">
                     <div class="font-bold text-emerald-600 text-sm mb-2 pb-1 border-b border-slate-200">${mName} ${year}</div>
                     <div class="grid grid-cols-7 text-[10px] text-slate-400 font-semibold text-center mb-1">
@@ -770,7 +874,7 @@
                 for (let d = 1; d <= lastD.getDate(); d++) {
                     const dStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                     const shift = appState.shifts.find(s => !s.deleted && s.date === dStr);
-                    
+
                     const todayStr = toLocalISODate(new Date());
                     const isToday = dStr === todayStr;
 
@@ -838,8 +942,9 @@
 
         function switchSettingsTab(tabName) {
             appState.currentTab = tabName;
-            ['add', 'delete', 'edit', 'extra'].forEach(t => {
+            ['add', 'delete', 'edit', 'extra', 'manage'].forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
+                if (!btn) return;
                 if (t === tabName) {
                     btn.className = 'w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 transition-all text-left';
                 } else {
@@ -852,6 +957,7 @@
             else if (tabName === 'delete') renderDeleteShiftTab(contentArea);
             else if (tabName === 'edit') renderEditShiftTab(contentArea);
             else if (tabName === 'extra') renderExtraFunctionsTab(contentArea);
+            else if (tabName === 'manage') renderManageTab(contentArea);
         }
 
         function renderAddShiftTab(container) {
@@ -870,7 +976,7 @@
                         <div>
                             <h4 class="text-lg font-bold text-slate-900">Schichten hinzufügen</h4>
                         </div>
-                        <button onclick="goToAddTimesStep()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Zeiten festlegen</button>
+                        <button onclick="goToAddTimesStep()" ${appState.selectedAddDates.length === 0 ? 'disabled' : ''} class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Weiter</button>
                     </div>
 
                     <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
@@ -906,14 +1012,14 @@
                 const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const isSelected = appState.selectedAddDates.includes(dStr);
                 const hasShift = appState.shifts.some(s => !s.deleted && s.date === dStr);
-                
+
                 let bgClass = 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
                 if (isSelected) {
                     bgClass = 'bg-emerald-700 text-white border-emerald-800 shadow-md';
                 } else if (hasShift) {
                     bgClass = 'bg-emerald-500 text-white border-emerald-600 shadow-sm';
                 }
-                
+
                 const todayStr = toLocalISODate(new Date());
                 const isToday = dStr === todayStr;
 
@@ -968,33 +1074,85 @@
         }
 
         function renderAddShiftTimesStep(container) {
+            const multiDay = appState.selectedAddDates.length > 1;
+
+            // Empty state SVG (for missing locations/departments)
+            const emptySvgOption = `<option value="" disabled>Keine Einträge</option>`;
+
             let html = `
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h4 class="text-lg font-bold text-slate-900">Zeiten für ausgewählte Tage festlegen</h4>
+                            <h4 class="text-lg font-bold text-slate-900">Schichttyp für ausgewählte Tage wählen</h4>
                         </div>
                         <button onclick="appState.addShiftStep = 'dates'; switchSettingsTab('add');" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100">Zurück zur Kalenderauswahl</button>
                     </div>
+                    ${multiDay ? `
+                    <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                            <div>
+                                <div class="text-sm font-bold text-indigo-900">Alle Daten gleichzeitig ausfüllen</div>
+                                <div class="text-[11px] text-indigo-700">Wählt Typ, Ort und Abteilung für alle ${appState.selectedAddDates.length} Tage auf einmal</div>
+                            </div>
+                        </div>
+                        <button onclick="openBulkFillModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Ausfüllen</button>
+                    </div>
+                    ` : ''}
 
                     <div class="space-y-3 max-h-[450px] overflow-y-auto pr-2">
             `;
 
             appState.selectedAddDates.forEach(dateStr => {
-                const existingTime = appState.addedShiftTimesData[dateStr] || { start: '', end: '', type: 'Frühdienst', dept: '', loc: '' };
+                const existing = appState.addedShiftTimesData[dateStr] || {};
+                const currentType = existing.type || '';
+
+                // Placeholder option — keiner ausgewählt
+                const typeOptions = `<option value="" ${!currentType ? 'selected' : ''} disabled>— Bitte Schichttyp wählen —</option>` +
+                    Object.keys(appState.shiftPresets).map(t =>
+                        `<option value="${t}" ${currentType === t ? 'selected' : ''}>${t}</option>`
+                    ).join('');
+
+                const locOptions = appState.locations.length
+                    ? appState.locations.map(l => `<option value="${l}" ${existing.loc === l ? 'selected' : ''}>${l}</option>`).join('')
+                    : emptySvgOption;
+
+                const deptOptions = appState.departments.length
+                    ? appState.departments.map(d => `<option value="${d}" ${existing.dept === d ? 'selected' : ''}>${d}</option>`).join('')
+                    : emptySvgOption;
+
+                const preset = currentType ? getPresetForType(currentType) : null;
+                const timeDisplay = preset
+                    ? `${preset.start} – ${preset.end}`
+                    : `<svg class="w-4 h-4 inline text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
                 html += `
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-4">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-3">
                         <div class="w-40 font-bold text-xs text-slate-800 leading-tight">${formatDetailDate(dateStr)}</div>
-                        <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        
-                        <div class="flex-1 grid grid-cols-5 gap-2">
-                            <input type="text" id="time-start-${dateStr}" maxlength="5" value="${existingTime.start}" oninput="handleTimeInput(event, '${dateStr}', 'start')" placeholder="07:00" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <input type="text" id="time-end-${dateStr}" maxlength="5" value="${existingTime.end}" oninput="handleTimeInput(event, '${dateStr}', 'end')" placeholder="15:30" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <div class="flex items-center justify-center text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-xl border border-emerald-100 text-center" id="type-badge-${dateStr}">${existingTime.type}</div>
-                            <input type="text" id="loc-${dateStr}" value="${existingTime.loc}" placeholder="Ort" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                            <input type="text" id="dept-${dateStr}" value="${existingTime.dept}" placeholder="Abteilung" oninput="updateAddedShiftData('${dateStr}')" class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+
+                        <div class="flex-1 grid grid-cols-4 gap-2">
+                            <select onchange="handleTypeChange('${dateStr}', this.value)"
+                                    class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold ${!currentType ? 'text-slate-400' : ''}">
+                                ${typeOptions}
+                            </select>
+
+                            <div class="flex items-center justify-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1.5 rounded-xl border border-emerald-100 text-center">
+                                ${timeDisplay}
+                            </div>
+
+                            <select onchange="updateAddedShiftData('${dateStr}')" id="loc-${dateStr}"
+                                    class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                                <option value="">— Ort —</option>
+                                ${locOptions}
+                            </select>
+
+                            <select onchange="updateAddedShiftData('${dateStr}')" id="dept-${dateStr}"
+                                    class="px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
+                                <option value="">— Abteilung —</option>
+                                ${deptOptions}
+                            </select>
                         </div>
-                        
+
                         <button onclick="removeAddedDateIfNoTime('${dateStr}')" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Tag entfernen">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
@@ -1011,69 +1169,60 @@
             checkSaveAddedShiftsReady();
         }
 
-        function handleTimeInput(e, dateStr, field) {
-            let val = e.target.value.replace(/[^0-9]/g, '');
-            if (val.length >= 2 && !val.includes(':')) {
-                val = val.substring(0, 2) + ':' + val.substring(2, 4);
+        function handleTypeChange(dateStr, type) {
+            if (!type) {
+                delete appState.addedShiftTimesData[dateStr];
+                switchSettingsTab('add');
+                checkSaveAddedShiftsReady();
+                return;
             }
-            e.target.value = val;
-            
-            if (field === 'start' && val.length === 5) {
-                const endInput = document.getElementById(`time-end-${dateStr}`);
-                if (endInput) endInput.focus();
-            }
-
-            updateAddedShiftData(dateStr);
+            const preset = getPresetForType(type);
+            const locEl = document.getElementById(`loc-${dateStr}`);
+            const deptEl = document.getElementById(`dept-${dateStr}`);
+            appState.addedShiftTimesData[dateStr] = {
+                type: type,
+                start: preset.start,
+                end: preset.end,
+                loc: locEl ? locEl.value : '',
+                dept: deptEl ? deptEl.value : ''
+            };
+            switchSettingsTab('add');
+            checkSaveAddedShiftsReady();
         }
 
-        function autoCalculateShiftType(startTime) {
-            if (!startTime || startTime.length < 5) return 'Frühdienst';
-            const hour = parseInt(startTime.split(':')[0], 10);
-            if (hour >= 5 && hour < 14) return 'Frühdienst';
-            if (hour >= 14 && hour < 22) return 'Spätdienst';
-            return 'Nachtdienst';
+        function getPresetForType(type) {
+            return appState.shiftPresets[type] || appState.shiftPresets['Frühdienst'];
         }
 
         function updateAddedShiftData(dateStr) {
-            const startInput = document.getElementById(`time-start-${dateStr}`);
-            const endInput = document.getElementById(`time-end-${dateStr}`);
-            const locInput = document.getElementById(`loc-${dateStr}`);
-            const deptInput = document.getElementById(`dept-${dateStr}`);
-            
-            const start = startInput ? startInput.value : '';
-            const end = endInput ? endInput.value : '';
-            const loc = locInput ? locInput.value : '';
-            const dept = deptInput ? deptInput.value : '';
-            
-            const calculatedType = autoCalculateShiftType(start);
+            const locEl = document.getElementById(`loc-${dateStr}`);
+            const deptEl = document.getElementById(`dept-${dateStr}`);
+            const existing = appState.addedShiftTimesData[dateStr] || {};
+            const preset = existing.type ? getPresetForType(existing.type) : null;
 
-            const badge = document.getElementById(`type-badge-${dateStr}`);
-            if(badge) badge.textContent = calculatedType;
-
-            if (start && end) {
-                appState.addedShiftTimesData[dateStr] = { start, end, type: calculatedType, dept, loc };
-            } else {
-                delete appState.addedShiftTimesData[dateStr];
+            if (existing.type) {
+                appState.addedShiftTimesData[dateStr] = {
+                    type: existing.type,
+                    start: preset.start,
+                    end: preset.end,
+                    loc: locEl ? locEl.value : '',
+                    dept: deptEl ? deptEl.value : ''
+                };
             }
             checkSaveAddedShiftsReady();
         }
 
         function checkSaveAddedShiftsReady() {
             const saveBtn = document.getElementById('save-added-shifts-btn');
-            if(!saveBtn) return;
-            const allHaveTimes = appState.selectedAddDates.length > 0 && appState.selectedAddDates.every(d => {
+            if (!saveBtn) return;
+            const allHaveData = appState.selectedAddDates.length > 0 && appState.selectedAddDates.every(d => {
                 const data = appState.addedShiftTimesData[d];
-                return data && data.start && data.end;
+                return data && data.type && data.start && data.end;
             });
-            saveBtn.disabled = !allHaveTimes;
+            saveBtn.disabled = !allHaveData;
         }
 
         function removeAddedDateIfNoTime(dateStr) {
-            const data = appState.addedShiftTimesData[dateStr];
-            if (data && (data.start || data.end)) {
-                showToast('Kann nicht entfernt werden.', 'error');
-                return;
-            }
             appState.selectedAddDates = appState.selectedAddDates.filter(d => d !== dateStr);
             delete appState.addedShiftTimesData[dateStr];
             switchSettingsTab('add');
@@ -1082,7 +1231,7 @@
         function saveAddedShifts() {
             appState.selectedAddDates.forEach(dateStr => {
                 const data = appState.addedShiftTimesData[dateStr];
-                if (data && data.start && data.end) {
+                if (data && data.start && data.end && data.type) {
                     const [sh, sm] = data.start.split(':').map(Number);
                     const [eh, em] = data.end.split(':').map(Number);
                     let diffMins = (eh * 60 + em) - (sh * 60 + sm);
@@ -1099,8 +1248,8 @@
                         startTime: data.start,
                         endTime: data.end,
                         duration: durationStr,
-                        department: data.dept || 'Intensivmedizin',
-                        location: data.loc || 'Station A',
+                        department: data.dept || (appState.departments[0] || 'Intensivmedizin'),
+                        location: data.loc || (appState.locations[0] || 'Station A'),
                         deleted: false
                     });
                 }
@@ -1109,7 +1258,63 @@
             appState.addedShiftTimesData = {};
             appState.addShiftStep = 'dates';
             showToast('Schichten hinzugefügt.', 'info');
-            saveToFirebase(); // Firebase Sync
+            saveToFirebase();
+            switchSettingsTab('add');
+        }
+
+        // ===== Bulk Fill Modal =====
+        function openBulkFillModal() {
+            const modal = document.getElementById('bulk-fill-modal');
+            const locSelect = document.getElementById('bulk-loc');
+            const deptSelect = document.getElementById('bulk-dept');
+
+            // Locations
+            let locOpts = '<option value="">— Bitte wählen —</option>';
+            if (appState.locations.length) {
+                locOpts += appState.locations.map(l => `<option value="${l}">${l}</option>`).join('');
+            }
+            locSelect.innerHTML = locOpts;
+
+            // Departments
+            let deptOpts = '<option value="">— Bitte wählen —</option>';
+            if (appState.departments.length) {
+                deptOpts += appState.departments.map(d => `<option value="${d}">${d}</option>`).join('');
+            }
+            deptSelect.innerHTML = deptOpts;
+
+            document.getElementById('bulk-type').value = '';
+            document.getElementById('bulk-count').textContent = appState.selectedAddDates.length;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeBulkFillModal() {
+            document.getElementById('bulk-fill-modal').classList.add('hidden');
+        }
+
+        function applyBulkFill() {
+            const type = document.getElementById('bulk-type').value;
+            const loc = document.getElementById('bulk-loc').value;
+            const dept = document.getElementById('bulk-dept').value;
+
+            if (!type) {
+                showToast('Bitte einen Schichttyp wählen.', 'error');
+                return;
+            }
+
+            const preset = getPresetForType(type);
+            appState.selectedAddDates.forEach(dateStr => {
+                appState.addedShiftTimesData[dateStr] = {
+                    type: type,
+                    start: preset.start,
+                    end: preset.end,
+                    loc: loc,
+                    dept: dept
+                };
+            });
+
+            showToast(`${appState.selectedAddDates.length} Tage wurden aktualisiert.`, 'info');
+            closeBulkFillModal();
             switchSettingsTab('add');
         }
 
@@ -1117,7 +1322,7 @@
             const year = appState.currentDate.getFullYear();
             const month = appState.currentDate.getMonth();
             const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            
+
             let html = `
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
@@ -1201,7 +1406,7 @@
                 shift.deleted = true;
                 appState.deletedShifts.push(shift);
                 showToast('Schicht gelöscht.', 'info');
-                saveToFirebase(); // Firebase Sync
+                saveToFirebase();
             }
             closeDeleteConfirmModal();
             appState.deleteModeActive = false;
@@ -1317,8 +1522,16 @@
 
             closeEditShiftModal();
             showToast('Schicht aktualisiert.', 'info');
-            saveToFirebase(); // Firebase Sync
+            saveToFirebase();
             switchSettingsTab('edit');
+        }
+
+        function autoCalculateShiftType(startTime) {
+            if (!startTime || startTime.length < 5) return 'Frühdienst';
+            const hour = parseInt(startTime.split(':')[0], 10);
+            if (hour >= 5 && hour < 14) return 'Frühdienst';
+            if (hour >= 14 && hour < 22) return 'Zwischendienst';
+            return 'Nachtdienst';
         }
 
         function openMoveDateModal() {
@@ -1340,7 +1553,7 @@
                 shift.date = targetDate;
                 shift.day = new Date(targetDate).toLocaleDateString('de-DE', { weekday: 'long' });
                 showToast(`Schicht auf ${formatDate(targetDate)} verschoben.`, 'info');
-                saveToFirebase(); // Firebase Sync
+                saveToFirebase();
             }
             closeMoveDateModal();
             closeEditShiftModal();
@@ -1351,7 +1564,7 @@
             const canvas = document.getElementById('shiftChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            
+
             if (shiftChartInstance) {
                 shiftChartInstance.destroy();
             }
@@ -1363,7 +1576,7 @@
                     datasets: [{
                         label: 'Arbeitsstunden',
                         data: dataPoints,
-                        backgroundColor: '#059669', // emerald-600
+                        backgroundColor: '#059669',
                         borderRadius: 4
                     }]
                 },
@@ -1409,7 +1622,6 @@
                 });
             }
 
-            // Exakte Berechnung in Stunden
             let sortedShifts = [...activeShifts].sort((a,b) => new Date(a.date) - new Date(b.date));
             let totalHoursExact = 0;
             let chartDataAgg = {};
@@ -1418,9 +1630,9 @@
                 const [sh, sm] = s.startTime.split(':').map(Number);
                 const [eh, em] = s.endTime.split(':').map(Number);
                 let mins = (eh * 60 + em) - (sh * 60 + sm);
-                if (mins < 0) mins += 24 * 60; 
+                if (mins < 0) mins += 24 * 60;
                 let hrs = mins / 60;
-                
+
                 totalHoursExact += hrs;
 
                 let label = formatDate(s.date);
@@ -1487,7 +1699,6 @@
                             </div>
                         </div>
 
-                        <!-- Detaillierte Tabelle für PDF -->
                         <div class="hidden pdf-only-table mt-8">
                             <h5 class="text-lg font-bold text-slate-800 mb-4">Schichtdetails (${sortedShifts.length})</h5>
                             <table class="w-full text-left text-sm border-collapse">
@@ -1537,6 +1748,163 @@
             }
         }
 
+        // ===== Manage Tab (Orte & Abteilungen) =====
+        function renderManageTab(container) {
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900">Orte & Abteilungen verwalten</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Diese Listen erscheinen als Auswahl beim Hinzufügen neuer Schichten.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 space-y-3 shadow-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Einsatzorte</span>
+                                <button onclick="addLocation()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-semibold shadow-sm transition-all">+ Hinzufügen</button>
+                            </div>
+                            <div class="space-y-2 max-h-[400px] overflow-y-auto">
+                                ${appState.locations.length === 0
+                                    ? '<p class="text-xs text-slate-400">Noch keine Orte vorhanden.</p>'
+                                    : appState.locations.map((loc, i) => `
+                                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                            <input type="text" value="${loc}" onchange="editLocation(${i}, this.value)"
+                                                   class="flex-1 text-sm bg-transparent focus:outline-none">
+                                            <button onclick="removeLocation(${i})" class="text-slate-400 hover:text-red-600 transition-colors" title="Löschen">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 space-y-3 shadow-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Abteilungen</span>
+                                <button onclick="addDepartment()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-semibold shadow-sm transition-all">+ Hinzufügen</button>
+                            </div>
+                            <div class="space-y-2 max-h-[400px] overflow-y-auto">
+                                ${appState.departments.length === 0
+                                    ? '<p class="text-xs text-slate-400">Noch keine Abteilungen vorhanden.</p>'
+                                    : appState.departments.map((dept, i) => `
+                                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                            <input type="text" value="${dept}" onchange="editDepartment(${i}, this.value)"
+                                                   class="flex-1 text-sm bg-transparent focus:outline-none">
+                                            <button onclick="removeDepartment(${i})" class="text-slate-400 hover:text-red-600 transition-colors" title="Löschen">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+// ===== Add Item Modal (Ort / Abteilung) =====
+let addItemMode = null; // 'location' | 'department'
+
+function addLocation() {
+    addItemMode = 'location';
+    document.getElementById('add-item-title').textContent = 'Neuer Einsatzort';
+    document.getElementById('add-item-input').value = '';
+    document.getElementById('add-item-input').placeholder = 'z.B. Station A';
+    document.getElementById('add-item-error').classList.add('hidden');
+    document.getElementById('add-item-modal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('add-item-input').focus(), 50);
+}
+
+function addDepartment() {
+    addItemMode = 'department';
+    document.getElementById('add-item-title').textContent = 'Neue Abteilung';
+    document.getElementById('add-item-input').value = '';
+    document.getElementById('add-item-input').placeholder = 'z.B. Intensivmedizin';
+    document.getElementById('add-item-error').classList.add('hidden');
+    document.getElementById('add-item-modal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('add-item-input').focus(), 50);
+}
+
+function closeAddItemModal() {
+    document.getElementById('add-item-modal').classList.add('hidden');
+    addItemMode = null;
+}
+
+function confirmAddItem() {
+    const input = document.getElementById('add-item-input');
+    const errEl = document.getElementById('add-item-error');
+    const value = input.value.trim();
+
+    errEl.classList.add('hidden');
+
+    if (!value) {
+        errEl.textContent = 'Name darf nicht leer sein.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+
+    if (addItemMode === 'location') {
+        if (appState.locations.includes(value)) {
+            errEl.textContent = 'Dieser Ort existiert bereits.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        appState.locations.push(value);
+        locationsRef.set(appState.locations);
+        showToast('Ort hinzugefügt.', 'info');
+    } else if (addItemMode === 'department') {
+        if (appState.departments.includes(value)) {
+            errEl.textContent = 'Diese Abteilung existiert bereits.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        appState.departments.push(value);
+        departmentsRef.set(appState.departments);
+        showToast('Abteilung hinzugefügt.', 'info');
+    }
+
+    closeAddItemModal();
+}
+
+        function editLocation(index, newValue) {
+            if (!newValue || !newValue.trim()) {
+                showToast('Name darf nicht leer sein.', 'error');
+                switchSettingsTab('manage');
+                return;
+            }
+            appState.locations[index] = newValue.trim();
+            locationsRef.set(appState.locations);
+            showToast('Ort aktualisiert.', 'info');
+        }
+
+        function removeLocation(index) {
+            if (!confirm(`Ort "${appState.locations[index]}" löschen?`)) return;
+            appState.locations.splice(index, 1);
+            locationsRef.set(appState.locations);
+            showToast('Ort gelöscht.', 'info');
+        }
+
+        function editDepartment(index, newValue) {
+            if (!newValue || !newValue.trim()) {
+                showToast('Name darf nicht leer sein.', 'error');
+                switchSettingsTab('manage');
+                return;
+            }
+            appState.departments[index] = newValue.trim();
+            departmentsRef.set(appState.departments);
+            showToast('Abteilung aktualisiert.', 'info');
+        }
+
+        function removeDepartment(index) {
+            if (!confirm(`Abteilung "${appState.departments[index]}" löschen?`)) return;
+            appState.departments.splice(index, 1);
+            departmentsRef.set(appState.departments);
+            showToast('Abteilung gelöscht.', 'info');
+        }
+
         function promptRestoreShift(index) {
             appState.pendingRestoreIndex = index;
             document.getElementById('restore-confirm-modal').classList.remove('hidden');
@@ -1553,7 +1921,7 @@
                 shift.deleted = false;
                 appState.shifts.push(shift);
                 showToast('Schicht wiederhergestellt.', 'info');
-                saveToFirebase(); // Firebase Sync
+                saveToFirebase();
             }
             closeRestoreConfirmModal();
             switchSettingsTab('extra');
@@ -1562,38 +1930,38 @@
         async function downloadPDFReport() {
             showToast('PDF wird generiert...', 'info');
             const element = document.getElementById('pdf-report-area');
-            
+
             const pdfHeader = element.querySelector('.pdf-only-header');
             const pdfTable = element.querySelector('.pdf-only-table');
-            
+
             if(pdfHeader) pdfHeader.classList.remove('hidden');
             if(pdfTable) pdfTable.classList.remove('hidden');
 
             try {
-                const canvas = await html2canvas(element, { 
+                const canvas = await html2canvas(element, {
                     scale: 2,
                     useCORS: true,
                     backgroundColor: '#ffffff'
                 });
-                
+
                 if(pdfHeader) pdfHeader.classList.add('hidden');
                 if(pdfTable) pdfTable.classList.add('hidden');
 
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
-                
+
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
+
                 pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
                 pdf.save(`ShogiDienste_Report_${formatDate(new Date())}.pdf`);
-                
+
                 showToast('PDF exportiert!', 'info');
             } catch(e) {
                 console.error(e);
                 showToast('Fehler bei der PDF Generierung', 'error');
-                
+
                 if(pdfHeader) pdfHeader.classList.add('hidden');
                 if(pdfTable) pdfTable.classList.add('hidden');
             }
